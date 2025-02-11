@@ -38,6 +38,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 
 ## Linux File System
 - The Linux file system is a hierarchical structure that organizes data and files on a Linux-based operating system.
+  
 | Directory | Description |
 |-----------|-------------|
 | /bin      | Essential command binaries |
