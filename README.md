@@ -22,6 +22,5 @@ Linux is an open-source operating system (OS) that's used in many industries and
    - **Hardware** - This includes all the hardware that your system runs on as well as memory, CPU, disks, etc.
    - **Linux Kernel** - As we discussed above, the kernel is the core of the operating system. It manages the hardware and tells it how to interact with the system.
    - **User Space** - This is where users like yourself will be directly interacting with the system.
-<br>
 ![Linux-Architecture](https://github.com/user-attachments/assets/5d029620-9d08-40f6-9f10-d301c387a52e)
 
