@@ -23,7 +23,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
    - **Linux Kernel** - As we discussed above, the kernel is the core of the operating system. It manages the hardware and tells it how to interact with the system.
    - **User Space** - This is where users like us will be directly interacting with the system.
 ![Linux-Architecture](https://github.com/user-attachments/assets/5d029620-9d08-40f6-9f10-d301c387a52e)
-<br>
+
 1. **Hardware**
    - The foundation of the Linux architecture, hardware includes physical components like the CPU, RAM, hard drive, motherboard, and peripherals. These components perform the actual computation, storage, and data processing. The hardware is the tangible layer where all operations ultimately execute.
 
