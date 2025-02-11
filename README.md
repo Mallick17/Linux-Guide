@@ -36,3 +36,24 @@ Linux is an open-source operating system (OS) that's used in many industries and
 4. **Applications**
    - Applications are the software programs users interact with directly, such as web browsers, text editors, or file managers. These applications rely on the kernel to access hardware resources and the shell to execute commands or scripts. For example, when you open a file in a text editor, the application sends a request to the kernel via the shell. The kernel retrieves the file from the hardware (e.g., the hard drive) and passes it back to the application, which then displays it to the user.
 
+## Linux File System
+- The Linux file system is a hierarchical structure that organizes data and files on a Linux-based operating system.
+| Directory | Description |
+|-----------|-------------|
+| /bin      | Essential command binaries |
+| /boot     | System Boot Loader files |
+| /etc      | Host-specific system-wide configuration files |
+| /media    | Media files such as CD-ROM |
+| /opt      | Add-on Application Software Packages |
+| /run      | Run-time program Data |
+| /sys      | Virtual directory providing info about the system |
+| /usr      | Unix System Resources |
+| /home     | User home directory |
+| /dev      | Device files |
+| /root     | Home Directory for root user |
+| /lib      | Shared library modules |
+| /mnt      | Temporary mounted file systems |
+| /proc     | Interface to kernel data structures |
+| /srv      | Site-Specific Data Served by this system |
+| /tmp      | Temporary files |
+| /var      | Files that are expected to change |
