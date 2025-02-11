@@ -1,6 +1,6 @@
-# Linux-Guide
-Linux Commands &amp; Scripts
-# Basics
+# Linux OS
+Linux Commands &amp; 
+
 
 <details>
 <summary>Linux File Hierarchy Standard (FHS)</summary>
