@@ -1,5 +1,5 @@
 # Linux OS
-Linux Commands &amp; 
+
 
 
 <details>
