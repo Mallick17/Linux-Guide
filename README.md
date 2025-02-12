@@ -18,6 +18,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
   - _Linux Mint_ -- **Less Bloated & Less distro than Ubuntu.**
 
  ## Linux Architecture
+ - The Linux kernel is monolithic, meaning it operates in a single address space. It’s composed of several components: process management for executing processes, memory management for efficient memory allocation and use, device drivers for managing hardware interaction, system calls as interfaces for requesting services from the kernel, and file system management.
  - A Linux system is divided into three main parts:
    - **Hardware** - This includes all the hardware that your system runs on as well as memory, CPU, disks, etc.
    - **Linux Kernel** - As we discussed above, the kernel is the core of the operating system. It manages the hardware and tells it how to interact with the system.
