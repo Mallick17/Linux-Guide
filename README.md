@@ -88,3 +88,56 @@ Linux is an open-source operating system (OS) that's used in many industries and
   ```
 </details>
 
+### Anatomy of a Disk: 
+
+#### **1. Partitions: Slicing the Disk Pie**  
+- Disks are divided into **partitions**, creating multiple block devices.  
+  - Example: `/dev/sda` = whole disk, `/dev/sda1` = first partition.  
+- Partitions help organize data and allow different filesystems on the same disk.  
+
+
+#### **2. Partition Table: The Disk's Blueprint**  
+- Every disk has a **partition table** that maps out:  
+  - Where partitions start and end.  
+  - Which partitions are bootable.  
+  - Which disk sectors belong to which partition.
+  - You can have multiple partitions on a disk and they can't overlap each other. If there is space that is not allocated to a partition, then it is known as free space. 
+- Two main types: **MBR** (old) and **GPT** (new).  
+
+
+#### **3. MBR (Master Boot Record)**  
+- **Old-school standard**.  
+- Can have primary, extended, and logical partitions.
+- Supports up to **4 primary partitions**.  
+  - Need more? Convert one primary into an **extended partition** and add **logical partitions** inside it.  
+- Limited to disks **up to 2TB**.  
+
+
+#### **4. GPT (GUID Partition Table)**  
+- **Modern standard**.  
+- No partition type nonsense—just create as many partitions as you need.  
+- Each partition gets a **globally unique ID (GUID)**.  
+- Works best with **UEFI-based booting**.  
+
+#### **5. Filesystem Structure: The Organized Chaos**  
+A filesystem is more than just files and directories. Here's the breakdown:  
+
+1. **Boot Block**:  
+   - Located in the first few sectors of the file system.  
+   - Contains bootloader info for the OS.  
+   - Only one boot block is actively used, even if multiple partitions have them.  
+
+2. **Super Block**:  
+   - Single block after the boot block.  
+   - Stores metadata about the filesystem:  
+     - Size of the inode table.  
+     - Size of logical blocks.  
+     - Total size of the filesystem.  
+
+3. **Inode Table**:  
+   - The **database** of the filesystem that manages our files.  
+   - Each file/directory has a unique **inode entry** containing metadata (permissions, size, location, etc.).  
+
+4. **Data Blocks**:  
+   - Where the actual **file data** and **directory structures** live.  
+
