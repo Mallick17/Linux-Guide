@@ -141,3 +141,26 @@ A filesystem is more than just files and directories. Here's the breakdown:
 4. **Data Blocks**:  
    - Where the actual **file data** and **directory structures** live.  
 
+- **Check out Disk Partition on your machine:**
+  ```sh
+  [root@rhel ~]# parted -l
+  ```
+<details>
+  <summary>Output - Click to view disk partition information</summary>
+  
+  ```sh
+  [root@rhel ~]# parted -l
+  Model: Xen Virtual Block Device (xvd)
+  Disk /dev/xvda: 10.7GB
+  Sector size (logical/physical): 512B/512B
+  Partition Table: gpt
+  Disk Flags:
+
+  Number  Start   End     Size    File system  Name  Flags
+   1      1049kB  2097kB  1049kB                     bios_grub
+   2      2097kB  212MB   210MB   fat16              boot, esp
+   3      212MB   1286MB  1074MB  xfs                bls_boot
+   4      1286MB  10.7GB  9452MB  xfs
+
+   ```
+</details>
