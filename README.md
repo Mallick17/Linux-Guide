@@ -74,7 +74,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
   ```
 <details>
   <summary>Output - Click to view filesystem information</summary>
-  ```rhel
+  ```sh
   [root@rhel ~]# df -T
   Filesystem     Type     1K-blocks    Used Available Use% Mounted on
   devtmpfs       devtmpfs      4096       0      4096   0% /dev
