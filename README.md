@@ -39,7 +39,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 ## Linux File System
 - The Linux file system is a hierarchical structure that organizes data and files on a Linux-based operating system.
   
-# Linux File Systems
+## Linux File Systems
 
 | Directory | Description |
 |-----------|-------------|
@@ -61,3 +61,29 @@ Linux is an open-source operating system (OS) that's used in many industries and
 | /tmp      | Storage for temporary files. |
 | /usr      | This is unfortunately named, most often it does not contain user files in the sense of a home folder. This is meant for user-installed software and utilities, however, that is not to say you can't add personal directories in there. Inside this directory are sub-directories for `/usr/bin`, `/usr/local`, etc. |
 | /var      | Variable directory, it's used for system logging, user tracking, caches, etc. Basically anything that is subject to change all the time. |
+
+###  Common Desktop Filesystem Types
+1. **ext4** - This is the most current version of the native Linux filesystems. It is compatible with the older ext2 and ext3 versions. It supports disk volumes up to 1 exabyte and file sizes up to 16 terabytes and much more. It is the standard choice for Linux filesystems.
+2. **Btrfs - "Better or Butter FS"** it is a new filesystem for Linux that comes with snapshots, incremental backups, performance increase and much more. It is widely available, but not quite stable and compatible yet.
+3. **XFS** - High performance journaling file system, great for a system with large files such as a media server.
+4. **NTFS and FAT** - Windows filesystems
+5. **HFS+** - Macintosh filesystem
+- **Check out what filesystems are on your machine:**
+  ```sh
+  [root@rhel ~]# df -T
+  ```
+<details>
+  <summary>**Output** - Click to view filesystem information</summary>
+
+  ```plaintext
+  Filesystem     Type     1K-blocks    Used Available Use% Mounted on
+  devtmpfs       devtmpfs      4096       0      4096   0% /dev
+  tmpfs          tmpfs       391472       0    391472   0% /dev/shm
+  tmpfs          tmpfs       156592    8892    147700   6% /run
+  /dev/xvda4     xfs        9164780 2651652   6513128  29% /
+  /dev/xvda3     xfs         983040  274096    708944  28% /boot
+  /dev/xvda2     vfat        204580    7196    197384   4% /boot/efi
+  tmpfs          tmpfs        78292       4     78288   1% /run/user/1000
+  ```
+</details>
+
