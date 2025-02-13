@@ -486,6 +486,8 @@ Learn the fundamentals of the command line, including navigating files, director
 | **18. alias**              | `alias`                              | Create a shortcut for a command.                                                | `alias ll='ls -la'` (creates an alias for `ls -la`).                        |
 | **19. exit**               | `exit`                               | Exit the shell or terminal.                                                     | `exit` (closes the terminal).
 
+---
+
 ## Filesystem Basic Commands
 
 | **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
