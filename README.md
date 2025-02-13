@@ -63,7 +63,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 | /sbin     | Contains essential system binaries, usually can only be run by root. |
 | /srv      | Site-specific data which are served by the system. |
 | /tmp      | Storage for temporary files. |
-| /usr      | This is unfortunately named, most often it does not contain user files in the sense of a home folder. This is meant for user-installed software and utilities, however, that is not to say you can't add personal directories in there. Inside this directory are sub-directories for `/usr/bin`, `/usr/local`, etc. |
+| /usr      | User-installed software and utilities, however, that is not to say you can't add personal directories in there. Inside this directory are sub-directories for `/usr/bin`, `/usr/local`, etc. |
 | /var      | Variable directory, it's used for system logging, user tracking, caches, etc. Basically anything that is subject to change all the time. |
 
 ###  Common Desktop Filesystem Types
