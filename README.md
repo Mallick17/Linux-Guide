@@ -77,7 +77,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
   [root@rhel ~]# df -T
   ```
 <details>
-  <summary>Output - Click to view filesystem information</summary>
+  <summary>Click to View Filesystem Information</summary>
   
   ```sh
   [root@rhel ~]# df -T
