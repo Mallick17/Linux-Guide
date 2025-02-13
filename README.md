@@ -461,6 +461,7 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 
 </details>
 
+---
 ## **Basic Command Lines**
 Learn the fundamentals of the command line, including navigating files, directories, and performing basic operations.
 
@@ -485,6 +486,31 @@ Learn the fundamentals of the command line, including navigating files, director
 | **17. whatis**             | `whatis`                             | Display a brief description of a command.                                       | `whatis ls` (shows a one-line description of `ls`).                         |
 | **18. alias**              | `alias`                              | Create a shortcut for a command.                                                | `alias ll='ls -la'` (creates an alias for `ls -la`).                        |
 | **19. exit**               | `exit`                               | Exit the shell or terminal.                                                     | `exit` (closes the terminal).
+
+---
+## **Text Manipulation and Navigation**
+Basic text manipulation and navigation using command-line tools. These commands helps in process, filter, and transform text data efficiently.
+
+**Commands and Examples**
+
+| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
+|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **1. stdout**              | `>`                                  | Redirect standard output to a file.                                             | `ls > output.txt` (saves `ls` output to `output.txt`).                      |
+| **2. stdin**               | `<`                                  | Redirect standard input from a file.                                            | `sort < input.txt` (sorts the contents of `input.txt`).                     |
+| **3. stderr**              | `2>`                                 | Redirect standard error to a file.                                             | `ls /nonexistent 2> error.txt` (saves errors to `error.txt`).               |
+| **4. pipe and tee**        | `|`, `tee`                           | Pipe output to another command or file.                                         | `ls | grep txt` (finds files containing `txt`).                                 |
+| **5. env**                 | `env`                                | Display environment variables.                                                  | `env` (shows all environment variables).                                    |
+| **6. cut**                 | `cut`                                | Extract specific columns or fields from text.                                   | `cut -d: -f1 /etc/passwd` (extracts usernames from `/etc/passwd`).          |
+| **7. paste**               | `paste`                              | Merge lines of files.                                                           | `paste file1.txt file2.txt` (merges lines from two files).                  |
+| **8. head**                | `head`                               | Display the first few lines of a file.                                          | `head -n 5 file.txt` (shows the first 5 lines of `file.txt`).               |
+| **9. tail**                | `tail`                               | Display the last few lines of a file.                                           | `tail -n 5 file.txt` (shows the last 5 lines of `file.txt`).                |
+| **10. expand and unexpand**| `expand`, `unexpand`                 | Convert tabs to spaces and vice versa.                                          | `expand file.txt` (converts tabs to spaces).                                |
+| **11. join and split**     | `join`, `split`                      | Combine or split files.                                                         | `split -l 100 file.txt` (splits `file.txt` into 100-line chunks).           |
+| **12. sort**               | `sort`                               | Sort lines of text.                                                             | `sort file.txt` (sorts the contents of `file.txt`).                         |
+| **13. tr**                 | `tr`                                 | Translate or delete characters.                                                 | `tr 'a-z' 'A-Z' < file.txt` (converts lowercase to uppercase).              |
+| **14. uniq**               | `uniq`                               | Remove duplicate lines from sorted text.                                        | `uniq file.txt` (removes duplicate lines).                                  |
+| **15. wc and nl**          | `wc`, `nl`                           | Count lines, words, and characters or number lines.                             | `wc -l file.txt` (counts lines in `file.txt`).                              |
+| **16. grep**               | `grep`                               | Search for patterns in text.                                                    | `grep "error" log.txt` (finds lines containing `error`).                    |
 
 ---
 
