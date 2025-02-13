@@ -25,6 +25,9 @@ Linux is an open-source operating system (OS) that's used in many industries and
    - **User Space** - This is where users like us will be directly interacting with the system.
 ![Linux-Architecture](https://github.com/user-attachments/assets/5d029620-9d08-40f6-9f10-d301c387a52e)
 
+<details>
+  <summary>Output - Click to View LINUX ARCHITECTURE EXPLAINED</summary>
+  
 1. **Hardware**
    - The foundation of the Linux architecture, hardware includes physical components like the CPU, RAM, hard drive, motherboard, and peripherals. These components perform the actual computation, storage, and data processing. The hardware is the tangible layer where all operations ultimately execute.
 
@@ -36,6 +39,9 @@ Linux is an open-source operating system (OS) that's used in many industries and
 
 4. **Applications**
    - Applications are the software programs users interact with directly, such as web browsers, text editors, or file managers. These applications rely on the kernel to access hardware resources and the shell to execute commands or scripts. For example, when you open a file in a text editor, the application sends a request to the kernel via the shell. The kernel retrieves the file from the hardware (e.g., the hard drive) and passes it back to the application, which then displays it to the user.
+  
+</details>  
+
 
 ## Linux File System
 - The Linux file system is a hierarchical structure that organizes data and files on a Linux-based operating system.
