@@ -171,7 +171,7 @@ A filesystem is more than just files and directories. Here's the breakdown:
 </details>
 </details>
 
-### Disk Partitioning: 
+### Disk Partitioning & Creating a File System in the Partitioned Disk & Mount-UMount
 - Disk partitioning is a critical task for managing storage devices.
 - There are several tools available for disk partitioning, each with its own strengths:
   - **`fdisk`**: A basic command-line partitioning tool. It does **not** support GPT (GUID Partition Table).
@@ -299,7 +299,163 @@ resize 2 1245 3456
 ```
 - Select the partition number and then the start and end points of where you want to resize it to.
 
+### **Creating A Filesystems**
+- Command to make a file system in the partitioned disk
+```bash
+sudo mkfs -t ext4 /dev/xvda2
+```
+**Output:**
+```
+ubuntu@ip-172-31-3-50:~$ sudo mkfs -t ext4 /dev/xvda
+mke2fs 1.47.0 (5-Feb-2023)
+/dev/xvda is apparently in use by the system; will not make a filesystem here!
+ubuntu@ip-172-31-3-50:~$ sudo mkfs -t ext4 /dev/xvda2
+mke2fs 1.47.0 (5-Feb-2023)
+
+Filesystem too small for a journal
+Creating filesystem with 255 4k blocks and 128 inodes
+
+Allocating group tables: done
+Writing inode tables: done
+Writing superblocks and filesystem accounting information: done
+```
+- Verify the file system
+  ```bash
+  ubuntu@ip-172-31-3-50:~$ sudo blkid /dev/xvda2
+  /dev/xvda2: UUID="b628debc-4071-40f7-881d-0ac4060be819" BLOCK_SIZE="4096" TYPE="ext4" PARTLABEL="ext4" PARTUUID="51db5af8-4c7e-4814-8075-14f065161923"
+  ```
+
+## Mounting and Unmounting a Partitioned Disk
+ We'll use the partition `/dev/xvda2` and mount it to `/home/ubuntu/mydrive`.
+
+---
+
+## **1. Create a Mount Point**
+
+First, create a directory to serve as the mount point for the partition:
+
+```bash
+ubuntu@ip-172-31-3-50:~$ mkdir mydrive
+```
+---
+
+## **2. Mount the Partition**
+
+Mount the partition `/dev/xvda2` to the `mydrive` directory using the `mount` command:
+
+```bash
+ubuntu@ip-172-31-3-50:~$ sudo mount -t ext4 /dev/xvda2 /home/ubuntu/mydrive
+```
+
+**Explanation:**
+- `sudo`: Run the command with root privileges.
+- `mount`: Command to mount a file system.
+- `-t ext4`: Specifies the file system type (`ext4` in this case).
+- `/dev/xvda2`: The partition to mount.
+- `/home/ubuntu/mydrive`: The mount point.
+
+---
+
+## **3. Verify the Mount**
+
+To confirm that the partition has been successfully mounted, use the `blkid` and `findmnt` commands.
+
+### **Check Partition Details with `blkid`:**
+
+```bash
+ubuntu@ip-172-31-3-50:~$ sudo blkid
+```
+
+**Output:**
+
+```
+/dev/xvda16: LABEL="BOOT" UUID="91942573-b0ea-4e42-8692-2a195de77cba" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="0f03bd19-c47e-4864-9884-634fc120fb03"
+/dev/xvda1: LABEL="cloudimg-rootfs" UUID="104656f3-cbcd-4c1a-bbe2-5bb510be86c0" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="2bb9818b-3393-4017-8da7-c739e7b96eac"
+/dev/xvda15: LABEL_FATBOOT="UEFI" LABEL="UEFI" UUID="534B-8AD0" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="1179273d-96b8-4541-b634-ffe44e498cd0"
+/dev/xvda2: UUID="b628debc-4071-40f7-881d-0ac4060be819" BLOCK_SIZE="4096" TYPE="ext4" PARTLABEL="ext4" PARTUUID="51db5af8-4c7e-4814-8075-14f065161923"
+/dev/loop1: BLOCK_SIZE="131072" TYPE="squashfs"
+/dev/xvda14: PARTUUID="5ec5cc0b-28cf-468c-a6e5-61c8f025ccc3"
+/dev/loop2: BLOCK_SIZE="131072" TYPE="squashfs"
+/dev/loop0: BLOCK_SIZE="131072" TYPE="squashfs"
+```
+
+- `/dev/xvda2` is confirmed to have an `ext4` file system.
+
+### **Check Mounted File Systems with `findmnt`:**
+
+```bash
+ubuntu@ip-172-31-3-50:~$ findmnt
+```
+
+**Output:**
+
+```
+TARGET                SOURCE    FSTYPE   OPTIONS
+/                     /dev/xvda1 ext4     rw,relatime,discard,errors=remount-ro,commit=30
+...
+└─/home/ubuntu/mydrive /dev/xvda2 ext4     rw,relatime
+```
+
+- `/dev/xvda2` is mounted at `/home/ubuntu/mydrive`.
+
+---
+
+## **4. Unmount the Partition**
+
+When you're done using the partition, unmount it using the `umount` command:
+
+```bash
+ubuntu@ip-172-31-3-50:~$ sudo umount /home/ubuntu/mydrive
+```
+
+**Verify the Unmount:**
+
+```bash
+ubuntu@ip-172-31-3-50:~$ findmnt
+```
+
+**Output:**
+
+```
+TARGET                SOURCE    FSTYPE   OPTIONS
+/                     /dev/xvda1 ext4     rw,relatime,discard,errors=remount-ro,commit=30
+...
+```
+
+- The `/home/ubuntu/mydrive` entry is no longer listed, confirming that the partition has been unmounted.
+
+---
+
+## **5. Summary of Commands**
+
+### **Mounting:**
+1. Create a mount point:
+   ```bash
+   mkdir mydrive
+   ```
+2. Mount the partition:
+   ```bash
+   sudo mount -t ext4 /dev/xvda2 /home/ubuntu/mydrive
+   ```
+3. Verify the mount:
+   ```bash
+   sudo blkid
+   findmnt
+   ```
+
+### **Unmounting:**
+1. Unmount the partition:
+   ```bash
+   sudo umount /home/ubuntu/mydrive
+   ```
+2. Verify the unmount:
+   ```bash
+   findmnt
+   ```
+---
+
 </details>
+
 
 
 
