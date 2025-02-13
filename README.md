@@ -180,7 +180,7 @@ A filesystem is more than just files and directories. Here's the breakdown:
 4. Verify and save changes.
 
 <details>
-  <summary> **Click to View Disk Partitioning: A Practical Guide with Executed Steps** </summary>
+  <summary>Click to View Disk Partitioning: A Practical Guide with Executed Steps</summary>
 
   ### **Step 1: Launch `parted`**
 Open your terminal and launch `parted` with root privileges:
@@ -286,6 +286,16 @@ Once you're done, exit the `parted` shell:
 ```
 Information: You may need to update /etc/fstab.
 ```
+
+### **Step 7: Resize a Partition**
+- You can also resize a partition if you don't have any space.
+```bash
+resize 2 1245 3456
+```
+- Select the partition number and then the start and end points of where you want to resize it to.
+
 </details>
+
+
 
 
