@@ -165,3 +165,127 @@ A filesystem is more than just files and directories. Here's the breakdown:
 
    ```
 </details>
+
+### Disk Partitioning: A Practical Guide with Executed Steps
+- Disk partitioning is a critical task for managing storage devices.
+- There are several tools available for disk partitioning, each with its own strengths:
+  - **`fdisk`**: A basic command-line partitioning tool. It does **not** support GPT (GUID Partition Table).
+  - **`parted`**: A versatile command-line tool that supports both MBR (Master Boot Record) and GPT partitioning.
+  - **`gparted`**: The GUI version of `parted`, ideal for users who prefer a graphical interface.
+  - **`gdisk`**: Similar to `fdisk`, but it **only supports GPT** (no MBR).
+- Partitioning a disk is a straightforward process with the right tools. Using `parted`, you can:
+1. Select the target device.
+2. View the current partition table.
+3. Create new partitions with specific start and end points.
+4. Verify and save changes.
+
+<details>
+  <summary>Click to view disk partition executed guide</summary>
+
+  ### **Step 1: Launch `parted`**
+Open your terminal and launch `parted` with root privileges:
+
+```bash
+$ sudo parted
+```
+
+**Output:**
+
+```
+GNU Parted 3.6
+Using /dev/xvda
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted)
+```
+
+---
+
+### **Step 3: View the Current Partition Table**
+To inspect the current partition table, use the `print` command:
+
+```bash
+(parted) print
+```
+
+**Output:**
+
+```
+Model: Xen Virtual Block Device (xvd)
+Disk /dev/xvda: 26.8GB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+Disk Flags:
+
+Number  Start   End     Size    File system  Name  Flags
+14      1049kB  5243kB  4194kB                     bios_grub
+15      5243kB  116MB   111MB   fat32              boot, esp
+16      116MB   1074MB  957MB   ext4               bls_boot
+ 1      1075MB  26.8GB  25.8GB  ext4
+```
+
+- **Number**: Partition number.
+- **Start/End**: Location of the partition on the disk.
+- **File system**: File system format (e.g., ext4, fat32).
+- **Flags**: Special attributes (e.g., `boot`, `esp`).
+
+---
+
+### **Step 4: Create a New Partition**
+To create a new partition, use the `mkpart` command. For example, to create a primary partition from 123MB to 4567MB:
+
+```bash
+(parted) mkpart primary 123 4567
+```
+
+**Output:**
+
+```
+Warning: The resulting partition is not properly aligned for best performance: 2097153s % 2048s != 0s
+Ignore/Cancel? Ignore
+```
+
+---
+
+### **Step 5: Verify the New Partition**
+After creating the partition, verify it by printing the partition table again:
+
+```bash
+(parted) print
+```
+
+**Output:**
+
+```
+Model: Xen Virtual Block Device (xvd)
+Disk /dev/xvda: 26.8GB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+Disk Flags:
+
+Number  Start   End     Size    File system  Name  Flags
+14      1049kB  5243kB  4194kB                     bios_grub
+15      5243kB  116MB   111MB   fat32              boot, esp
+16      116MB   1074MB  957MB   ext4               bls_boot
+ 2      1074MB  1075MB  1048kB               ext4
+ 1      1075MB  26.8GB  25.8GB  ext4
+```
+
+- **Partition 2**: The newly created partition (1074MB–1075MB).
+
+---
+
+### **Step 6: Exit `parted`**
+Once you're done, exit the `parted` shell:
+
+```bash
+(parted) quit
+```
+
+**Output:**
+
+```
+Information: You may need to update /etc/fstab.
+```
+</details>
+
+
