@@ -26,7 +26,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 ![Linux-Architecture](https://github.com/user-attachments/assets/5d029620-9d08-40f6-9f10-d301c387a52e)
 
 <details>
-  <summary>Output - Click to View LINUX ARCHITECTURE EXPLAINED</summary>
+  <summary>Click to View LINUX ARCHITECTURE EXPLAINED</summary>
   
 1. **Hardware**
    - The foundation of the Linux architecture, hardware includes physical components like the CPU, RAM, hard drive, motherboard, and peripherals. These components perform the actual computation, storage, and data processing. The hardware is the tangible layer where all operations ultimately execute.
@@ -42,11 +42,8 @@ Linux is an open-source operating system (OS) that's used in many industries and
   
 </details>  
 
-
-## Linux File System
-- The Linux file system is a hierarchical structure that organizes data and files on a Linux-based operating system.
-  
 ## Linux File Systems
+- The Linux file system is a hierarchical structure that organizes data and files on a Linux-based operating system.
 
 | Directory | Description |
 |-----------|-------------|
