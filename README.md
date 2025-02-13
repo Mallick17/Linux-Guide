@@ -466,7 +466,7 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 The terms **Init**, **System V**, **Upstart**, and **Systemd** are all related to the initialization and management of services and processes in Unix-like operating systems (e.g., Linux). They represent different generations of **init systems**, which are responsible for booting the system, starting services, and managing system states. 
 
 <details>
-  <summary>Below is an explanation of each, their differences, and their purposes.</summary>
+  <summary>Click to check explanation of each, their differences, and their purposes.</summary>
   
 ### **1. Init (Initialization)**
 - **What**: Init is the first process that starts when a Unix-like system boots. It has a Process ID (PID) of 1 and is responsible for starting and managing other processes and services.
