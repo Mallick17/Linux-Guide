@@ -67,11 +67,16 @@ Linux is an open-source operating system (OS) that's used in many industries and
 | /var      | Variable directory, it's used for system logging, user tracking, caches, etc. Basically anything that is subject to change all the time. |
 
 ###  Common Desktop Filesystem Types
+<details>
+  <summary>Click to View Common Types of Desktop Filesystem</summary>
+  
 1. **ext4** - This is the most current version of the native Linux filesystems. It is compatible with the older ext2 and ext3 versions. It supports disk volumes up to 1 exabyte and file sizes up to 16 terabytes and much more. It is the standard choice for Linux filesystems.
 2. **Btrfs - "Better or Butter FS"** it is a new filesystem for Linux that comes with snapshots, incremental backups, performance increase and much more. It is widely available, but not quite stable and compatible yet.
 3. **XFS** - High performance journaling file system, great for a system with large files such as a media server.
 4. **NTFS and FAT** - Windows filesystems
 5. **HFS+** - Macintosh filesystem
+</details>
+
 - **Check out what filesystems are on your machine:**
   ```sh
   [root@rhel ~]# df -T
