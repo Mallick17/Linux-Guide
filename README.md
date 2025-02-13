@@ -166,7 +166,7 @@ A filesystem is more than just files and directories. Here's the breakdown:
    ```
 </details>
 
-### Disk Partitioning: A Practical Guide with Executed Steps
+### Disk Partitioning: 
 - Disk partitioning is a critical task for managing storage devices.
 - There are several tools available for disk partitioning, each with its own strengths:
   - **`fdisk`**: A basic command-line partitioning tool. It does **not** support GPT (GUID Partition Table).
@@ -180,7 +180,7 @@ A filesystem is more than just files and directories. Here's the breakdown:
 4. Verify and save changes.
 
 <details>
-  <summary>Click to view disk partition executed guide</summary>
+  <summary> **Click to View Disk Partitioning: A Practical Guide with Executed Steps** </summary>
 
   ### **Step 1: Launch `parted`**
 Open your terminal and launch `parted` with root privileges:
