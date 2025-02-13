@@ -494,6 +494,31 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 |                            | `ls -l`                              | List files and show symlinks.                                                  | `ls -l /path/to/dir` (shows symlinks with their targets).                   |
 
 ---
+## User Management Commands
+| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
+|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **1. Users and Groups**     | `id`                                 | Display user and group information.                                             | `id username` (shows UID, GID, and groups).                                 |
+|                            | `groups`                             | List groups a user belongs to.                                                  | `groups username` (lists groups for the user).                              |
+|                            | `whoami`                             | Display the current logged-in user.                                             | `whoami` (shows the current user).                                          |
+| **2. root**                 | `sudo`                               | Execute a command as the superuser (root).                                      | `sudo apt update` (runs the command with root privileges).                  |
+|                            | `su`                                 | Switch to another user (default is root).                                       | `su -` (switches to the root user).                                         |
+|                            | `sudo -i`                            | Start a root shell.                                                             | `sudo -i` (opens a root shell).                                             |
+| **3. /etc/passwd**          | `cat /etc/passwd`                    | Display the contents of `/etc/passwd`.                                          | `cat /etc/passwd` (lists all users and their details).                      |
+|                            | `grep`                               | Search for a specific user in `/etc/passwd`.                                    | `grep username /etc/passwd` (shows details for the user).                   |
+| **4. /etc/shadow**          | `sudo cat /etc/shadow`               | Display the contents of `/etc/shadow`.                                          | `sudo cat /etc/shadow` (shows encrypted passwords).                         |
+|                            | `sudo grep`                          | Search for a specific user in `/etc/shadow`.                                    | `sudo grep username /etc/shadow` (shows password details).                  |
+| **5. /etc/group**           | `cat /etc/group`                     | Display the contents of `/etc/group`.                                           | `cat /etc/group` (lists all groups and their members).                      |
+|                            | `grep`                               | Search for a specific group in `/etc/group`.                                    | `grep groupname /etc/group` (shows details for the group).                  |
+| **6. User Management Tools**| `useradd`                            | Add a new user.                                                                 | `sudo useradd username` (creates a new user).                               |
+|                            | `usermod`                            | Modify user properties.                                                         | `sudo usermod -aG groupname username` (adds user to a group).               |
+|                            | `userdel`                            | Delete a user.                                                                  | `sudo userdel username` (deletes a user).                                   |
+|                            | `passwd`                             | Change a user's password.                                                       | `sudo passwd username` (sets or changes a user's password).                 |
+|                            | `groupadd`                           | Add a new group.                                                                | `sudo groupadd groupname` (creates a new group).                            |
+|                            | `groupmod`                           | Modify group properties.                                                        | `sudo groupmod -n newgroupname oldgroupname` (renames a group).             |
+|                            | `groupdel`                           | Delete a group.                                                                 | `sudo groupdel groupname` (deletes a group).                                |
+|                            | `chage`                              | Change user password expiry information.                                        | `sudo chage -l username` (lists password expiry details).                   |
+
+---
 
 
 
