@@ -90,14 +90,15 @@ Linux is an open-source operating system (OS) that's used in many industries and
 </details>
 
 ### Anatomy of a Disk: 
-
-#### **1. Partitions: Slicing the Disk Pie**  
+- Hard disks can be subdivided into partitions, essentially making multiple block devices.
 - Disks are divided into **partitions**, creating multiple block devices.  
   - Example: `/dev/sda` = whole disk, `/dev/sda1` = first partition.  
 - Partitions help organize data and allow different filesystems on the same disk.  
 
-
-#### **2. Partition Table: The Disk's Blueprint**  
+<details>
+  <summary>Output - Click to view Anatomy of Disk Explained</summary>
+  
+#### **1. Partition Table: The Disk's Blueprint**  
 - Every disk has a **partition table** that maps out:  
   - Where partitions start and end.  
   - Which partitions are bootable.  
@@ -106,7 +107,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 - Two main types: **MBR** (old) and **GPT** (new).  
 
 
-#### **3. MBR (Master Boot Record)**  
+#### **2. MBR (Master Boot Record)**  
 - **Old-school standard**.  
 - Can have primary, extended, and logical partitions.
 - Supports up to **4 primary partitions**.  
@@ -114,13 +115,13 @@ Linux is an open-source operating system (OS) that's used in many industries and
 - Limited to disks **up to 2TB**.  
 
 
-#### **4. GPT (GUID Partition Table)**  
+#### **3. GPT (GUID Partition Table)**  
 - **Modern standard**.  
 - No partition type nonsense—just create as many partitions as you need.  
 - Each partition gets a **globally unique ID (GUID)**.  
 - Works best with **UEFI-based booting**.  
 
-#### **5. Filesystem Structure: The Organized Chaos**  
+#### **4. Filesystem Structure: The Organized Chaos**  
 A filesystem is more than just files and directories. Here's the breakdown:  
 
 1. **Boot Block**:  
@@ -164,6 +165,7 @@ A filesystem is more than just files and directories. Here's the breakdown:
    4      1286MB  10.7GB  9452MB  xfs
 
    ```
+</details>
 </details>
 
 ### Disk Partitioning: 
