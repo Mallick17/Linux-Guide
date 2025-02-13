@@ -461,6 +461,31 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 
 </details>
 
+## **Basic Command Lines**
+Learn the fundamentals of the command line, including navigating files, directories, and performing basic operations.
+
+| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
+|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **1. The Shell**           | `bash`, `sh`, `zsh`                  | Start a shell session.                                                          | `bash` (starts a Bash shell).                                               |
+| **2. pwd**                 | `pwd`                                | Print the current working directory.                                            | `pwd` (shows the current directory path).                                   |
+| **3. cd**                  | `cd`                                 | Change the current directory.                                                   | `cd /home` (changes to the `/home` directory).                              |
+| **4. ls**                  | `ls`                                 | List directory contents.                                                        | `ls -l` (lists files with details).                                         |
+| **5. touch**               | `touch`                              | Create an empty file or update the timestamp of a file.                         | `touch file.txt` (creates or updates `file.txt`).                           |
+| **6. file**                | `file`                               | Determine the type of a file.                                                   | `file file.txt` (shows the file type).                                      |
+| **7. cat**                 | `cat`                                | Display the contents of a file.                                                 | `cat file.txt` (prints the contents of `file.txt`).                         |
+| **8. less**                | `less`                               | View file contents interactively.                                               | `less file.txt` (opens `file.txt` in a pager).                              |
+| **9. history**             | `history`                            | Display command history.                                                        | `history` (shows previously executed commands).                             |
+| **10. cp**                 | `cp`                                 | Copy files or directories.                                                      | `cp file.txt /backup` (copies `file.txt` to `/backup`).                     |
+| **11. mv**                 | `mv`                                 | Move or rename files or directories.                                            | `mv file.txt newname.txt` (renames `file.txt`).                             |
+| **12. mkdir**              | `mkdir`                              | Create a new directory.                                                         | `mkdir newdir` (creates a directory named `newdir`).                        |
+| **13. rm**                 | `rm`                                 | Remove files or directories.                                                    | `rm file.txt` (deletes `file.txt`).                                         |
+| **14. find**               | `find`                               | Search for files or directories.                                                | `find /home -name "*.txt"` (finds `.txt` files in `/home`).                |
+| **15. help**               | `help`                               | Display help for shell built-in commands.                                       | `help cd` (shows help for the `cd` command).                                |
+| **16. man**                | `man`                                | Display the manual page for a command.                                          | `man ls` (shows the manual for `ls`).                                       |
+| **17. whatis**             | `whatis`                             | Display a brief description of a command.                                       | `whatis ls` (shows a one-line description of `ls`).                         |
+| **18. alias**              | `alias`                              | Create a shortcut for a command.                                                | `alias ll='ls -la'` (creates an alias for `ls -la`).                        |
+| **19. exit**               | `exit`                               | Exit the shell or terminal.                                                     | `exit` (closes the terminal).
+
 ## Filesystem Basic Commands
 
 | **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
