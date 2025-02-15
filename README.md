@@ -583,10 +583,11 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 </details>
 
 ---
-## Permissions
+## Permission Commands
 
 <details>
   <summary>Click to View File, User & Group Permission Commands</summary>
+  
 | **Topic**               | **Command**                                                                 | **Description**                                                                 | **Example**                                                                 |
 |-------------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
 | **File Permissions**    | `ls -l`                                                                     | Displays file permissions, ownership, and other details.                        | `ls -l file.txt` (Shows permissions for `file.txt`)                         |
