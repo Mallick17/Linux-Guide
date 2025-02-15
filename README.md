@@ -512,6 +512,42 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 
 </details>
 
+<details>
+  <summary>Click to view Detailed Filesystem Commands</summary>
+
+| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
+|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **1. Filesystem Hierarchy** | `ls`                                 | List directory contents.                                                       | `ls /` (lists root directory contents).                                     |
+|                            | `tree`                               | Display directory structure in a tree format.                                  | `tree /home` (shows the directory tree for `/home`).                        |
+| **2. Filesystem Types**     | `df -T`                              | Display filesystem type along with disk usage.                                 | `df -T /` (shows filesystem type for the root partition).                   |
+|                            | `lsblk -f`                           | List block devices with filesystem information.                                | `lsblk -f` (displays filesystem types for all partitions).                  |
+| **3. Anatomy of a Disk**    | `lsblk`                              | List block devices (disks and partitions).                                     | `lsblk` (shows disk and partition layout).                                  |
+|                            | `fdisk -l`                           | List disk partitions.                                                          | `fdisk -l /dev/sda` (displays partition table for `/dev/sda`).              |
+| **4. Disk Partitioning**    | `fdisk`                              | Interactive disk partitioning tool.                                            | `fdisk /dev/sda` (starts partitioning `/dev/sda`).                          |
+|                            | `parted`                             | Another partitioning tool with more features.                                 | `parted /dev/sda` (starts partitioning with `parted`).                      |
+|                            | `gdisk`                              | GPT partitioning tool.                                                         | `gdisk /dev/sda` (for GPT disks).                                           |
+| **5. Creating Filesystems** | `mkfs`                               | Create a filesystem.                                                           | `mkfs.ext4 /dev/sda1` (creates an ext4 filesystem on `/dev/sda1`).          |
+|                            | `mkswap`                             | Create a swap partition.                                                       | `mkswap /dev/sda2` (initializes `/dev/sda2` as swap).                       |
+| **6. mount and umount**     | `mount`                              | Mount a filesystem.                                                            | `mount /dev/sda1 /mnt` (mounts `/dev/sda1` to `/mnt`).                      |
+|                            | `umount`                             | Unmount a filesystem.                                                          | `umount /mnt` (unmounts the filesystem mounted at `/mnt`).                  |
+| **7. /etc/fstab**           | `blkid`                              | Get UUID of a partition.                                                       | `blkid /dev/sda1` (displays UUID for `/dev/sda1`).                          |
+|                            | `nano /etc/fstab`                    | Edit the filesystem table.                                                     | `nano /etc/fstab` (opens `/etc/fstab` for editing).                         |
+| **8. swap**                 | `swapon`                             | Enable a swap partition.                                                       | `swapon /dev/sda2` (enables swap on `/dev/sda2`).                           |
+|                            | `swapoff`                            | Disable a swap partition.                                                      | `swapoff /dev/sda2` (disables swap on `/dev/sda2`).                         |
+|                            | `free -h`                            | Check swap usage.                                                              | `free -h` (shows memory and swap usage).                                    |
+| **9. Disk Usage**           | `df`                                 | Display disk space usage.                                                      | `df -h` (shows disk usage in human-readable format).                        |
+|                            | `du`                                 | Estimate file space usage.                                                     | `du -sh /home` (shows total size of `/home` directory).                     |
+| **10. Filesystem Repair**   | `fsck`                               | Check and repair a filesystem.                                                 | `fsck /dev/sda1` (checks and repairs `/dev/sda1`).                          |
+|                            | `e2fsck`                             | Specifically for ext2/ext3/ext4 filesystems.                                   | `e2fsck /dev/sda1` (checks ext filesystems).                                |
+| **11. Inodes**              | `df -i`                              | Display inode usage.                                                           | `df -i /` (shows inode usage for the root filesystem).                      |
+|                            | `ls -i`                              | Display inode numbers of files.                                                | `ls -i /home` (lists files with their inode numbers).                       |
+| **12. symlinks**            | `ln -s`                              | Create a symbolic link.                                                        | `ln -s /path/to/file /path/to/symlink` (creates a symlink).                 |
+|                            | `readlink`                           | Display the target of a symlink.                                               | `readlink /path/to/symlink` (shows where the symlink points).               |
+|                            | `ls -l`                              | List files and show symlinks.                                                  | `ls -l /path/to/dir` (shows symlinks with their targets).                   |
+
+</details>
+---
+
 ---
 ## init
 The terms **Init** is Initialization where init acts as a **MOTHER OF ALL PROCESS & It has a Process ID (PID) of 1**, **System V**, **Upstart**, and **Systemd** are all related to the initialization and management of services and processes in Unix-like operating systems (e.g., Linux). They represent different generations of **init systems**, which are responsible for booting the system, starting services, and managing system states. 
@@ -602,40 +638,11 @@ Each system was developed to address the limitations of its predecessor, with Sy
 
 
 
-## Filesystem Basic Commands
 
-| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
-|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| **1. Filesystem Hierarchy** | `ls`                                 | List directory contents.                                                       | `ls /` (lists root directory contents).                                     |
-|                            | `tree`                               | Display directory structure in a tree format.                                  | `tree /home` (shows the directory tree for `/home`).                        |
-| **2. Filesystem Types**     | `df -T`                              | Display filesystem type along with disk usage.                                 | `df -T /` (shows filesystem type for the root partition).                   |
-|                            | `lsblk -f`                           | List block devices with filesystem information.                                | `lsblk -f` (displays filesystem types for all partitions).                  |
-| **3. Anatomy of a Disk**    | `lsblk`                              | List block devices (disks and partitions).                                     | `lsblk` (shows disk and partition layout).                                  |
-|                            | `fdisk -l`                           | List disk partitions.                                                          | `fdisk -l /dev/sda` (displays partition table for `/dev/sda`).              |
-| **4. Disk Partitioning**    | `fdisk`                              | Interactive disk partitioning tool.                                            | `fdisk /dev/sda` (starts partitioning `/dev/sda`).                          |
-|                            | `parted`                             | Another partitioning tool with more features.                                 | `parted /dev/sda` (starts partitioning with `parted`).                      |
-|                            | `gdisk`                              | GPT partitioning tool.                                                         | `gdisk /dev/sda` (for GPT disks).                                           |
-| **5. Creating Filesystems** | `mkfs`                               | Create a filesystem.                                                           | `mkfs.ext4 /dev/sda1` (creates an ext4 filesystem on `/dev/sda1`).          |
-|                            | `mkswap`                             | Create a swap partition.                                                       | `mkswap /dev/sda2` (initializes `/dev/sda2` as swap).                       |
-| **6. mount and umount**     | `mount`                              | Mount a filesystem.                                                            | `mount /dev/sda1 /mnt` (mounts `/dev/sda1` to `/mnt`).                      |
-|                            | `umount`                             | Unmount a filesystem.                                                          | `umount /mnt` (unmounts the filesystem mounted at `/mnt`).                  |
-| **7. /etc/fstab**           | `blkid`                              | Get UUID of a partition.                                                       | `blkid /dev/sda1` (displays UUID for `/dev/sda1`).                          |
-|                            | `nano /etc/fstab`                    | Edit the filesystem table.                                                     | `nano /etc/fstab` (opens `/etc/fstab` for editing).                         |
-| **8. swap**                 | `swapon`                             | Enable a swap partition.                                                       | `swapon /dev/sda2` (enables swap on `/dev/sda2`).                           |
-|                            | `swapoff`                            | Disable a swap partition.                                                      | `swapoff /dev/sda2` (disables swap on `/dev/sda2`).                         |
-|                            | `free -h`                            | Check swap usage.                                                              | `free -h` (shows memory and swap usage).                                    |
-| **9. Disk Usage**           | `df`                                 | Display disk space usage.                                                      | `df -h` (shows disk usage in human-readable format).                        |
-|                            | `du`                                 | Estimate file space usage.                                                     | `du -sh /home` (shows total size of `/home` directory).                     |
-| **10. Filesystem Repair**   | `fsck`                               | Check and repair a filesystem.                                                 | `fsck /dev/sda1` (checks and repairs `/dev/sda1`).                          |
-|                            | `e2fsck`                             | Specifically for ext2/ext3/ext4 filesystems.                                   | `e2fsck /dev/sda1` (checks ext filesystems).                                |
-| **11. Inodes**              | `df -i`                              | Display inode usage.                                                           | `df -i /` (shows inode usage for the root filesystem).                      |
-|                            | `ls -i`                              | Display inode numbers of files.                                                | `ls -i /home` (lists files with their inode numbers).                       |
-| **12. symlinks**            | `ln -s`                              | Create a symbolic link.                                                        | `ln -s /path/to/file /path/to/symlink` (creates a symlink).                 |
-|                            | `readlink`                           | Display the target of a symlink.                                               | `readlink /path/to/symlink` (shows where the symlink points).               |
-|                            | `ls -l`                              | List files and show symlinks.                                                  | `ls -l /path/to/dir` (shows symlinks with their targets).                   |
-
----
 ## User Management Commands
+- In traditional OS, users and groups manage access and permissions. Each user has a unique UID and a home directory (e.g., /home/username) for personal files. Groups (GID) assign shared permissions. Processes run under the owner's permissions, ensuring privacy (e.g., Jane can't access Bob's files).
+- Linux includes system users (e.g., daemons) and the root user, which has full system control. Root access is powerful but risky; users can use sudo for temporary root privileges instead of logging in as root.
+  
 | **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
 |----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
 | **1. Users and Groups**     | `id`                                 | Display user and group information.                                             | `id username` (shows UID, GID, and groups).                                 |
