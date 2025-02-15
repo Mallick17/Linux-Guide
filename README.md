@@ -611,7 +611,41 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 </details>
 
 ---
+## Processes
+- Processes are the programs that are running on your machine. They are managed by the kernel and each process has an ID associated with it called the process ID (PID). This PID is assigned in the order that processes are created.
+```bash
+root@ip-172-31-3-50:~# ps
+```
+![image](https://github.com/user-attachments/assets/f5bad342-3705-402e-a8af-9265899d1f44)
+- This shows you a quick snapshot of the current processes:
+  - PID: Process ID
+  - TTY: Controlling terminal associated with the process (we'll go in detail about this later)
+  - STAT: Process status code
+  - TIME: Total CPU usage time
+  - CMD: Name of executable/command
 
+<details>
+  <summary>Click to view Detailed Explaination Controlling Terminal, Processes Details, Process Creation, Process Termination, Signals, Signal Process, Common Signals</summary>
+
+### Controlling Terminal (TTY)
+- TTY is the terminal that executed the command.
+- Two types: Regular terminal (e.g., TTY1) and Pseudoterminal (e.g., pts/*).
+- Daemon processes have no controlling terminal (TTY = ?).
+### Process Details
+- The kernel is in charge of processes, when we run a program the kernel loads up the code of the program in memory, determines and allocates resources and then keeps tabs on each process, it knows:
+  - The status of the process
+  - The resources the process is using and receives
+  - The process owner
+  - Signal handling
+  - And basically everything else
+### Process Creation
+
+
+
+  
+</details>
+
+---
 ## init
 The terms **Init** is Initialization where init acts as a **MOTHER OF ALL PROCESS & It has a Process ID (PID) of 1**, **System V**, **Upstart**, and **Systemd** are all related to the initialization and management of services and processes in Unix-like operating systems (e.g., Linux). They represent different generations of **init systems**, which are responsible for booting the system, starting services, and managing system states. 
 
