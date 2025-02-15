@@ -10,7 +10,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 - Famous Linux distribution are: ubuntu, fedora, RedHat Enterprise Linux (RHEL), Arch Linux, Chrome OS and Debian.
 - **RedHat Package Manager**
   - _RedHat Enterprise Linux (RHEL)_
-  - _fedora_ -- **Upstream of RHEL, RHEL gets update from fedora after thorugh testing $ quality assurance.**
+  - _fedora_ -- **Upstream of RHEL, RHEL gets update from fedora after thorugh testing & quality assurance.**
   - _open SUSE_
 - **Debian Package Manager**
   - _Debian_
@@ -40,7 +40,63 @@ Linux is an open-source operating system (OS) that's used in many industries and
 4. **Applications**
    - Applications are the software programs users interact with directly, such as web browsers, text editors, or file managers. These applications rely on the kernel to access hardware resources and the shell to execute commands or scripts. For example, when you open a file in a text editor, the application sends a request to the kernel via the shell. The kernel retrieves the file from the hardware (e.g., the hard drive) and passes it back to the application, which then displays it to the user.
   
-</details>  
+</details>
+
+---
+
+## **Basic Command Lines**
+Learn the fundamentals of the command line, including navigating files, directories, and performing basic operations.
+
+| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
+|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **1. The Shell**           | `bash`, `sh`, `zsh`                  | Start a shell session.                                                          | `bash` (starts a Bash shell).                                               |
+| **2. pwd**                 | `pwd`                                | Print the current working directory.                                            | `pwd` (shows the current directory path).                                   |
+| **3. cd**                  | `cd`                                 | Change the current directory.                                                   | `cd /home` (changes to the `/home` directory).                              |
+| **4. ls**                  | `ls`                                 | List directory contents.                                                        | `ls -l` (lists files with details).                                         |
+| **5. touch**               | `touch`                              | Create an empty file or update the timestamp of a file.                         | `touch file.txt` (creates or updates `file.txt`).                           |
+| **6. file**                | `file`                               | Determine the type of a file.                                                   | `file file.txt` (shows the file type).                                      |
+| **7. cat**                 | `cat`                                | Display the contents of a file.                                                 | `cat file.txt` (prints the contents of `file.txt`).                         |
+| **8. less**                | `less`                               | View file contents interactively.                                               | `less file.txt` (opens `file.txt` in a pager).                              |
+| **9. history**             | `history`                            | Display command history.                                                        | `history` (shows previously executed commands).                             |
+| **10. cp**                 | `cp`                                 | Copy files or directories.                                                      | `cp file.txt /backup` (copies `file.txt` to `/backup`).                     |
+| **11. mv**                 | `mv`                                 | Move or rename files or directories.                                            | `mv file.txt newname.txt` (renames `file.txt`).                             |
+| **12. mkdir**              | `mkdir`                              | Create a new directory.                                                         | `mkdir newdir` (creates a directory named `newdir`).                        |
+| **13. rm**                 | `rm`                                 | Remove files or directories.                                                    | `rm file.txt` (deletes `file.txt`).                                         |
+| **14. find**               | `find`                               | Search for files or directories.                                                | `find /home -name "*.txt"` (finds `.txt` files in `/home`).                |
+| **15. help**               | `help`                               | Display help for shell built-in commands.                                       | `help cd` (shows help for the `cd` command).                                |
+| **16. man**                | `man`                                | Display the manual page for a command.                                          | `man ls` (shows the manual for `ls`).                                       |
+| **17. whatis**             | `whatis`                             | Display a brief description of a command.                                       | `whatis ls` (shows a one-line description of `ls`).                         |
+| **18. alias**              | `alias`                              | Create a shortcut for a command.                                                | `alias ll='ls -la'` (creates an alias for `ls -la`).                        |
+| **19. exit**               | `exit`                               | Exit the shell or terminal.                                                     | `exit` (closes the terminal).
+
+
+---
+
+## **Text Manipulation and Navigation**
+Basic text manipulation and navigation using command-line tools. These commands helps in process, filter, and transform text data efficiently.
+
+**Commands and Examples**
+
+| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
+|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **1. stdout**              | `>`                                  | Redirect standard output to a file.                                             | `ls > output.txt` (saves `ls` output to `output.txt`).                      |
+| **2. stdin**               | `<`                                  | Redirect standard input from a file.                                            | `sort < input.txt` (sorts the contents of `input.txt`).                     |
+| **3. stderr**              | `2>`                                 | Redirect standard error to a file.                                             | `ls /nonexistent 2> error.txt` (saves errors to `error.txt`).               |
+| **4. pipe and tee**        | `|`, `tee`                           | Pipe output to another command or file.                                         | `ls | grep txt` (finds files containing `txt`).                                 |
+| **5. env**                 | `env`                                | Display environment variables.                                                  | `env` (shows all environment variables).                                    |
+| **6. cut**                 | `cut`                                | Extract specific columns or fields from text.                                   | `cut -d: -f1 /etc/passwd` (extracts usernames from `/etc/passwd`).          |
+| **7. paste**               | `paste`                              | Merge lines of files.                                                           | `paste file1.txt file2.txt` (merges lines from two files).                  |
+| **8. head**                | `head`                               | Display the first few lines of a file.                                          | `head -n 5 file.txt` (shows the first 5 lines of `file.txt`).               |
+| **9. tail**                | `tail`                               | Display the last few lines of a file.                                           | `tail -n 5 file.txt` (shows the last 5 lines of `file.txt`).                |
+| **10. expand and unexpand**| `expand`, `unexpand`                 | Convert tabs to spaces and vice versa.                                          | `expand file.txt` (converts tabs to spaces).                                |
+| **11. join and split**     | `join`, `split`                      | Combine or split files.                                                         | `split -l 100 file.txt` (splits `file.txt` into 100-line chunks).           |
+| **12. sort**               | `sort`                               | Sort lines of text.                                                             | `sort file.txt` (sorts the contents of `file.txt`).                         |
+| **13. tr**                 | `tr`                                 | Translate or delete characters.                                                 | `tr 'a-z' 'A-Z' < file.txt` (converts lowercase to uppercase).              |
+| **14. uniq**               | `uniq`                               | Remove duplicate lines from sorted text.                                        | `uniq file.txt` (removes duplicate lines).                                  |
+| **15. wc and nl**          | `wc`, `nl`                           | Count lines, words, and characters or number lines.                             | `wc -l file.txt` (counts lines in `file.txt`).                              |
+| **16. grep**               | `grep`                               | Search for patterns in text.                                                    | `grep "error" log.txt` (finds lines containing `error`).                    |
+
+---
 
 ## Linux File Systems
 - The Linux file system is a hierarchical structure that organizes data and files on a Linux-based operating system.
@@ -546,58 +602,10 @@ The terms **Init** is Initialization where init acts as a **MOTHER OF ALL PROCES
 - **Systemd**: The modern init system, offering parallelized startup, advanced dependency management, and integration with other system components.
 
 Each system was developed to address the limitations of its predecessor, with Systemd being the most feature-rich and widely adopted in modern Linux distributions.
----
-## **Basic Command Lines**
-Learn the fundamentals of the command line, including navigating files, directories, and performing basic operations.
-
-| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
-|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| **1. The Shell**           | `bash`, `sh`, `zsh`                  | Start a shell session.                                                          | `bash` (starts a Bash shell).                                               |
-| **2. pwd**                 | `pwd`                                | Print the current working directory.                                            | `pwd` (shows the current directory path).                                   |
-| **3. cd**                  | `cd`                                 | Change the current directory.                                                   | `cd /home` (changes to the `/home` directory).                              |
-| **4. ls**                  | `ls`                                 | List directory contents.                                                        | `ls -l` (lists files with details).                                         |
-| **5. touch**               | `touch`                              | Create an empty file or update the timestamp of a file.                         | `touch file.txt` (creates or updates `file.txt`).                           |
-| **6. file**                | `file`                               | Determine the type of a file.                                                   | `file file.txt` (shows the file type).                                      |
-| **7. cat**                 | `cat`                                | Display the contents of a file.                                                 | `cat file.txt` (prints the contents of `file.txt`).                         |
-| **8. less**                | `less`                               | View file contents interactively.                                               | `less file.txt` (opens `file.txt` in a pager).                              |
-| **9. history**             | `history`                            | Display command history.                                                        | `history` (shows previously executed commands).                             |
-| **10. cp**                 | `cp`                                 | Copy files or directories.                                                      | `cp file.txt /backup` (copies `file.txt` to `/backup`).                     |
-| **11. mv**                 | `mv`                                 | Move or rename files or directories.                                            | `mv file.txt newname.txt` (renames `file.txt`).                             |
-| **12. mkdir**              | `mkdir`                              | Create a new directory.                                                         | `mkdir newdir` (creates a directory named `newdir`).                        |
-| **13. rm**                 | `rm`                                 | Remove files or directories.                                                    | `rm file.txt` (deletes `file.txt`).                                         |
-| **14. find**               | `find`                               | Search for files or directories.                                                | `find /home -name "*.txt"` (finds `.txt` files in `/home`).                |
-| **15. help**               | `help`                               | Display help for shell built-in commands.                                       | `help cd` (shows help for the `cd` command).                                |
-| **16. man**                | `man`                                | Display the manual page for a command.                                          | `man ls` (shows the manual for `ls`).                                       |
-| **17. whatis**             | `whatis`                             | Display a brief description of a command.                                       | `whatis ls` (shows a one-line description of `ls`).                         |
-| **18. alias**              | `alias`                              | Create a shortcut for a command.                                                | `alias ll='ls -la'` (creates an alias for `ls -la`).                        |
-| **19. exit**               | `exit`                               | Exit the shell or terminal.                                                     | `exit` (closes the terminal).
 
 ---
-## **Text Manipulation and Navigation**
-Basic text manipulation and navigation using command-line tools. These commands helps in process, filter, and transform text data efficiently.
 
-**Commands and Examples**
 
-| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
-|----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| **1. stdout**              | `>`                                  | Redirect standard output to a file.                                             | `ls > output.txt` (saves `ls` output to `output.txt`).                      |
-| **2. stdin**               | `<`                                  | Redirect standard input from a file.                                            | `sort < input.txt` (sorts the contents of `input.txt`).                     |
-| **3. stderr**              | `2>`                                 | Redirect standard error to a file.                                             | `ls /nonexistent 2> error.txt` (saves errors to `error.txt`).               |
-| **4. pipe and tee**        | `|`, `tee`                           | Pipe output to another command or file.                                         | `ls | grep txt` (finds files containing `txt`).                                 |
-| **5. env**                 | `env`                                | Display environment variables.                                                  | `env` (shows all environment variables).                                    |
-| **6. cut**                 | `cut`                                | Extract specific columns or fields from text.                                   | `cut -d: -f1 /etc/passwd` (extracts usernames from `/etc/passwd`).          |
-| **7. paste**               | `paste`                              | Merge lines of files.                                                           | `paste file1.txt file2.txt` (merges lines from two files).                  |
-| **8. head**                | `head`                               | Display the first few lines of a file.                                          | `head -n 5 file.txt` (shows the first 5 lines of `file.txt`).               |
-| **9. tail**                | `tail`                               | Display the last few lines of a file.                                           | `tail -n 5 file.txt` (shows the last 5 lines of `file.txt`).                |
-| **10. expand and unexpand**| `expand`, `unexpand`                 | Convert tabs to spaces and vice versa.                                          | `expand file.txt` (converts tabs to spaces).                                |
-| **11. join and split**     | `join`, `split`                      | Combine or split files.                                                         | `split -l 100 file.txt` (splits `file.txt` into 100-line chunks).           |
-| **12. sort**               | `sort`                               | Sort lines of text.                                                             | `sort file.txt` (sorts the contents of `file.txt`).                         |
-| **13. tr**                 | `tr`                                 | Translate or delete characters.                                                 | `tr 'a-z' 'A-Z' < file.txt` (converts lowercase to uppercase).              |
-| **14. uniq**               | `uniq`                               | Remove duplicate lines from sorted text.                                        | `uniq file.txt` (removes duplicate lines).                                  |
-| **15. wc and nl**          | `wc`, `nl`                           | Count lines, words, and characters or number lines.                             | `wc -l file.txt` (counts lines in `file.txt`).                              |
-| **16. grep**               | `grep`                               | Search for patterns in text.                                                    | `grep "error" log.txt` (finds lines containing `error`).                    |
-
----
 
 ## Filesystem Basic Commands
 
