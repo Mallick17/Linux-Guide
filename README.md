@@ -631,6 +631,7 @@ root@ip-172-31-3-50:~# ps
 - TTY is the terminal that executed the command.
 - Two types: Regular terminal (e.g., TTY1) and Pseudoterminal (e.g., pts/*).
 - Daemon processes have no controlling terminal (TTY = ?).
+  
 ### Process Details
 - The kernel is in charge of processes, when we run a program the kernel loads up the code of the program in memory, determines and allocates resources and then keeps tabs on each process, it knows:
   - The status of the process
@@ -638,12 +639,18 @@ root@ip-172-31-3-50:~# ps
   - The process owner
   - Signal handling
   - And basically everything else
+    
 ### Process Creation
 - When a new process is created, an existing process clones itself using the fork system call. This creates a nearly identical child process with a new process ID (PID), while the original process becomes its parent, identified by a parent process ID (PPID). The child process can either continue running the same program as the parent or, more commonly, use the execve system call to load a new program. execve replaces the current memory management setup with a new one for the program being launched.
 ```bash
 root@ip-172-31-3-50:~# ps -l
 ```
+
 ### Process Termination
+- When a process is no longer needed, it exits using the `_exit` system call, freeing its resources. The parent process must acknowledge this by calling `wait`, which checks the termination status. If the parent dies first, the child becomes an "orphan" and is adopted by `init`, which handles its termination.
+- If a child exits but the parent hasn’t called `wait`, it becomes a "zombie"—retaining an entry in the process table but freeing resources. Zombies can’t be killed and are only "reaped" when the parent calls `wait` or `init` handles it. Too many zombies can fill the process table, blocking new processes.
+
+### Signals
 - 
 
 
