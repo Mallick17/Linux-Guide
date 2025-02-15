@@ -166,7 +166,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 - Partitions help organize data and allow different filesystems on the same disk.  
 
 <details>
-  <summary>Output - Click to view Anatomy of Disk Explained</summary>
+  <summary>Click to view Detailed Anatomy of Disk, Disk Partitioning, Creating a File System in the Partitioned Disk & Mount-UMount</summary>
   
 #### **1. Partition Table: The Disk's Blueprint**  
 - Every disk has a **partition table** that maps out:  
@@ -216,12 +216,6 @@ A filesystem is more than just files and directories. Here's the breakdown:
 - **Check out Disk Partition on your machine:**
   ```sh
   [root@rhel ~]# parted -l
-  ```
-<details>
-  <summary>Output - Click to view disk partition information</summary>
-  
-  ```sh
-  [root@rhel ~]# parted -l
   Model: Xen Virtual Block Device (xvd)
   Disk /dev/xvda: 10.7GB
   Sector size (logical/physical): 512B/512B
@@ -235,8 +229,6 @@ A filesystem is more than just files and directories. Here's the breakdown:
    4      1286MB  10.7GB  9452MB  xfs
 
    ```
-</details>
-</details>
 
 ### Disk Partitioning & Creating a File System in the Partitioned Disk & Mount-UMount
 - Disk partitioning is a critical task for managing storage devices.
@@ -251,10 +243,7 @@ A filesystem is more than just files and directories. Here's the breakdown:
 3. Create new partitions with specific start and end points.
 4. Verify and save changes.
 
-<details>
-  <summary>Click to View Disk Partitioning: A Practical Guide with Executed Steps</summary>
-
-  ### **Step 1: Launch `parted`**
+### **Step 1: Launch `parted`**
 Open your terminal and launch `parted` with root privileges:
 
 ```bash
