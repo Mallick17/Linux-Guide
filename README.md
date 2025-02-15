@@ -584,9 +584,29 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 ---
 ## Permissions
 
+<details>
+  <summary>Click to View File, User & Group Permission Commands</summary>
+| **Topic**               | **Command**                                                                 | **Description**                                                                 | **Example**                                                                 |
+|-------------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **File Permissions**    | `ls -l`                                                                     | Displays file permissions, ownership, and other details.                        | `ls -l file.txt` (Shows permissions for `file.txt`)                         |
+| **Modifying Permissions** | `chmod`<br>`chmod u+x myfile`<br>`chmod u-x myfile`<br>`chmod ug+w`         | Changes file permissions for owner, group, and others.                          | `chmod 755 script.sh` (Sets `rwxr-xr-x` permissions)                       |
+| **Ownership Permissions** | `chown`<br>`chown patty myfile`<br>`sudo chgrp whales myfile`<br>`sudo chown patty:whales myfile` | Changes file ownership (user and group).                                        | `chown user:group file.txt` (Changes owner to `user` and group to `group`)  |
+| **Umask**               | `umask`                                                                     | Sets default permissions for newly created files and directories.               | `umask 022` (Sets default permissions to `rw-r--r--` for files)             |
+| **Setuid**              | `chmod u+s`<br>`chmod 4755`                                                 | Sets the SetUID bit, allowing a file to execute with the owner's permissions.    | `chmod u+s /usr/bin/program` (Runs `program` with owner's privileges)       |
+| **Setgid**              | `chmod g+s`<br>`chmod 2555`                                                 | Sets the SetGID bit, allowing a file to execute with the group's permissions.    | `chmod g+s /usr/bin/program` (Runs `program` with group's privileges)       |
+| **Process Permissions** | `ps -ef`                                                                    | Displays running processes and their permissions.                               | `ps -ef` (Shows all running processes with details)                         |
+| **The Sticky Bit**      | `chmod +t`<br>`chmod 1755`                                                  | Sets the sticky bit on a directory, restricting file deletion to the owner.      | `chmod +t /shared_dir` (Only owners can delete their files in `/shared_dir`)|
 
+### Notes:
+- **Permissions Notation**: 
+  - `r` = read, `w` = write, `x` = execute.
+  - Numeric notation: `4` = read, `2` = write, `1` = execute (e.g., `755` = `rwxr-xr-x`).
+- **Special Permissions**:
+  - SetUID (`u+s` or `4755`): Executes with owner's privileges.
+  - SetGID (`g+s` or `2555`): Executes with group's privileges.
+  - Sticky Bit (`+t` or `1755`): Restricts file deletion in directories.
 
-
+</details>
 
 ---
 
