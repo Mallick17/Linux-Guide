@@ -639,7 +639,12 @@ root@ip-172-31-3-50:~# ps
   - Signal handling
   - And basically everything else
 ### Process Creation
-
+- When a new process is created, an existing process clones itself using the fork system call. This creates a nearly identical child process with a new process ID (PID), while the original process becomes its parent, identified by a parent process ID (PPID). The child process can either continue running the same program as the parent or, more commonly, use the execve system call to load a new program. execve replaces the current memory management setup with a new one for the program being launched.
+```bash
+root@ip-172-31-3-50:~# ps -l
+```
+### Process Termination
+- 
 
 
   
