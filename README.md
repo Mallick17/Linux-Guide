@@ -131,6 +131,10 @@ Linux is an open-source operating system (OS) that's used in many industries and
 | /var      | Variable directory, it's used for system logging, user tracking, caches, etc. Basically anything that is subject to change all the time. |
 
 ###  Common Desktop Filesystem Types
+- **To Check out what filesystems are on our machine:**
+  ```sh
+  [root@rhel ~]# df -T
+  ```
 <details>
   <summary>Click to View Common Types of Desktop Filesystem</summary>
   
@@ -139,14 +143,8 @@ Linux is an open-source operating system (OS) that's used in many industries and
 3. **XFS** - High performance journaling file system, great for a system with large files such as a media server.
 4. **NTFS and FAT** - Windows filesystems
 5. **HFS+** - Macintosh filesystem
-</details>
 
-- **Check out what filesystems are on your machine:**
-  ```sh
-  [root@rhel ~]# df -T
-  ```
-<details>
-  <summary>Click to View Filesystem Information</summary>
+- Check `df -T` to View Filesystem Information on our system.
   
   ```sh
   [root@rhel ~]# df -T
