@@ -549,7 +549,7 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 
 ---
 
-## User Management Commands
+## User Management
 - In traditional OS, users and groups manage access and permissions. Each user has a unique UID and a home directory (e.g., /home/username) for personal files. Groups (GID) assign shared permissions. Processes run under the owner's permissions, ensuring privacy (e.g., Jane can't access Bob's files).
 - Linux includes system users (e.g., daemons) and the root user, which has full system control. Root access is powerful but risky; users can use sudo for temporary root privileges instead of logging in as root.
 
@@ -580,6 +580,13 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 |                            | `chage`                              | Change user password expiry information.                                        | `sudo chage -l username` (lists password expiry details).                   |
 
 </details>
+
+---
+## Permissions
+
+
+
+
 
 ---
 
