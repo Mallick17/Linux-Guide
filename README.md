@@ -166,7 +166,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 - Partitions help organize data and allow different filesystems on the same disk.  
 
 <details>
-  <summary>Click to view Detailed Anatomy of Disk, Disk Partitioning, Creating a File System in the Partitioned Disk & Mount-UMount</summary>
+  <summary>Click to view Detailed Anatomy of Disk,Practical Guide to Disk Partitioning, Creating a File System in the Partitioned Disk & Mount-UMount to the partioned disk.</summary>
   
 #### **1. Partition Table: The Disk's Blueprint**  
 - Every disk has a **partition table** that maps out:  
