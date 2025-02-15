@@ -47,7 +47,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 ## **Basic Command Lines**
 
 <details>
-  <summary>Learn the fundamentals of the command line, including navigating files, directories, and performing basic operations.</summary>
+  <summary>Click to Learn the fundamentals of the command line, including navigating files, directories, and performing basic operations.</summary>
 
 | **Topic**                  | **Command**                          | **Description**                                                                 | **Example**                                                                 |
 |----------------------------|--------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
