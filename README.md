@@ -989,7 +989,7 @@ Each system was developed to address the limitations of its predecessor, with Sy
 
 
 <details>
-  <summary>Click to check explanation of COmmands Used</summary>
+  <summary>Click to check explanation of Commands Used</summary>
 
 ### Monitoring Processes with `top`
 
@@ -1106,10 +1106,57 @@ sda               0.17         3.49         1.92     385106     212417
   - `kB_wrtn`: Total data written
 </details>
 
+---
 
+## Logging
+### System Logging
+- System services, kernels, and daemons generate activity data, which is saved as logs in the `/var` directory. These logs provide a readable record of system events.
+- A service called **syslog** (or **rsyslog** on newer systems) manages these logs. It uses a daemon (like `syslogd` or `rsyslogd`) to receive, filter, and store event messages. Depending on the rules, messages can be saved to files, displayed on the console, or ignored.
+- While syslog is a central logging tool, many applications create their own log files. Logs typically include a **timestamp** and **event details**. For example:
+```
+Jan 27 07:41:32 icebox anacron[4650]: Job `cron.weekly' started
+```
+- This shows the `cron.weekly` job ran at the specified time. You can view such logs in `/var/log/syslog`.
 
+### logrotate
+- **The logrotate utility does log management for us. It has a configuration file that allows us to specify how many and what logs to keep, how to compress our logs to save space and more. The logrotate tool is usually run out of cron once a day and the configuration files can be found in `/etc/logrotate.d.`**
 
+  
+<details>
+  <summary>Click to View Detailed explaination of Logging</summary>
 
+### syslog
+- **Syslog** manages and sends logs to the system logger. **Rsyslog** is an enhanced version used by most Linux systems. Logs collected by syslog are stored in `/var/log/syslog` (excluding auth messages).
+- To see which files are logged, check the configuration in `/etc/rsyslog.d/`. For example:
+```bash
+less /etc/rsyslog.d/50-default.conf
+```
+- This file defines rules where the left column specifies the log type (selector) and the right column specifies the action (e.g., saving to a file like `/var/log/auth.log` or `/var/log/syslog`). Not all applications use rsyslog, so check the directory for specific logs.
+- To test logging, use the `logger` command:
+```bash
+logger -s Hello
+```
+- Check `/var/log/syslog` to see the "Hello" entry.
+
+### General Logging
+- There are many log files you can view on your system, many important ones can be found under /var/log. We won't go through them all, but we'll discuss a couple of the major ones.
+  1. `/var/log/messages`
+     - This log contains all non-critical and non-debug messages, includes messages logged during bootup (dmesg), auth, cron, daemon, etc. Very useful to get a glimpse of how your machine is acting.
+  2. `/var/log/syslog`
+     - This logs everything except auth messages, it's extremely useful for debugging errors on your machine.
+
+### Kernel Logging
+- `/var/log/dmesg`
+  - On boot-time your system logs information about the kernel ring buffer. This shows us information about hardware drivers, kernel information and status during bootup and more. This log file can be found at /var/log/dmesg and gets reset on every boot, you may not actually see any use in it now, but if you were to ever have issues with something during bootup or a hardware issue, dmesg is the best place to look. You can also view this log using the dmesg command.
+- `/var/log/kern.log`
+  - Another log you can use to view kernel information is the /var/log/kern.log file, this logs the kernel information and events on your system, it also logs dmesg output.
+
+### Authentication Logging
+- `/var/log/auth.log`
+  - This contains system authorization logs, such as user login and the authentication method used.
+    ```bash
+    
+</details>
 
 
 
