@@ -649,11 +649,30 @@ root@ip-172-31-3-50:~# ps -l
 ```
 
 ### Process Termination
-- When a process is no longer needed, it exits using the `_exit` system call, freeing its resources. The parent process must acknowledge this by calling `wait`, which checks the termination status. If the parent dies first, the child becomes an "orphan" and is adopted by `init`, which handles its termination.
-- If a child exits but the parent hasn’t called `wait`, it becomes a "zombie"—retaining an entry in the process table but freeing resources. Zombies can’t be killed and are only "reaped" when the parent calls `wait` or `init` handles it. Too many zombies can fill the process table, blocking new processes.
-
+- When a process is no longer needed, it can exit using the `_exit` system call, freeing its resources. The process reports its termination status to the kernel, with `0` typically meaning success. However, the process isn't fully terminated until its parent acknowledges it using the `wait` system call, which checks the termination status. If the parent doesn't call `wait`, the process becomes a **zombie**.
+- **Orphan Processes**
+  - If a parent process dies before its child, the kernel assigns the child to `init` (the main system process). `Init` then handles the `wait` call, allowing the orphan to terminate properly.
+- **Zombie Processes**
+  - When a child process terminates but the parent hasn't called `wait`, it becomes a zombie. Zombies free their resources but remain in the process table until the parent calls `wait` (or `init` does it if the parent is gone). Too many zombies can fill the process table, blocking new processes.
+    
 ### Signals
-- 
+**Signals** are notifications sent to a process to inform it that an event has occurred. They act as software interrupts and serve various purposes:
+- **User actions**: Like pressing Ctrl-C to interrupt or Ctrl-Z to suspend a process.  
+- **Hardware/software issues**: The kernel notifies processes of problems.  
+- **Inter-process communication**: Signals allow processes to communicate.
+When a signal is generated, it stays **pending** until delivered to the process. Processes can:
+- Ignore the signal.  
+- Catch and handle it with a custom routine.  
+- Terminate the process.  
+- Block the signal (if allowed).
+**Common Signals**:  
+- **SIGHUP (1)**: Hangup.  
+- **SIGINT (2)**: Interrupt (e.g., Ctrl-C).  
+- **SIGKILL (9)**: Kill (unblockable, terminates process).  
+- **SIGSEGV (11)**: Segmentation fault.  
+- **SIGTERM (15)**: Software termination.  
+- **SIGSTOP**: Stop process.
+Signals are usually referred to by names (e.g., SIGKILL) rather than numbers, as numbers can vary. Some signals, like SIGKILL, cannot be blocked.
 
 
   
