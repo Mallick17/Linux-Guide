@@ -804,50 +804,69 @@ The terms **Init** is Initialization where init acts as a **MOTHER OF ALL PROCES
 
 <details>
   <summary>Click to check explanation of each, their differences, and their purposes.</summary>
-  
-### **1. Init (Initialization)**
-- **What**: Init is the first process that starts when a Unix-like system boots. It has a Process ID (PID) of 1 and is responsible for starting and managing other processes and services.
-- **How**: Init reads configuration files (like `/etc/inittab`) to determine which processes to start and in what order.
-- **Why**: Init ensures that essential system services (e.g., networking, logging, etc.) are started during boot and manages system runlevels (system states).
+
+### **1. System V Overview**
+The main job of **init** is to start and stop essential system processes. To check if you're using Sys V, look for the `/etc/inittab` file. If it exists, you're likely using Sys V.
+
+Sys V starts and stops processes in order. For example, if service **foo-a** needs to run before **foo-b**, Sys V ensures this sequence using scripts. These scripts, usually found in `/etc/init.d` or `/etc/rc.d`, handle starting and stopping services.
+
+**Pros**: Easy to manage dependencies (e.g., foo-a before foo-b).  
+**Cons**: Slower performance since processes start/stop one at a time.
+
+Sys V uses **runlevels** (0-6) to define the system's state:
+
+- **0**: Shutdown  
+- **1**: Single User Mode  
+- **2**: Multiuser mode without networking  
+- **3**: Multiuser mode with networking  
+- **4**: Unused  
+- **5**: Multiuser mode with networking and GUI  
+- **6**: Reboot  
+
+On startup, the system checks the runlevel and runs scripts in `/etc/rc.d/rc[runlevel].d/` or `/etc/init.d`. Scripts starting with **S** (start) or **K** (kill) run during startup or shutdown, respectively, in numerical order.
+
+For example:
+```
+pete@icebox:/etc/rc.d/rc0.d$ ls
+K10updates  K80openvpn
+```
+This means during shutdown (runlevel 0), the system will first stop the `updates` service, then `openvpn`.
+
+You can find and change the default runlevel in `/etc/inittab`.
+
+**Note**: Sys V is being phased out, but runlevels may still appear in newer init systems to support older Sys V scripts.
 
 ---
 
-### **2. System V Overview**
-- **What**: System V (SysV) is one of the earliest and most widely used init systems. It is named after Unix System V, a version of Unix.
-- **How**: It uses shell scripts located in `/etc/init.d/` or `/etc/rc.d/` to start and stop services. These scripts are executed in a specific order based on runlevels (e.g., runlevel 3 for multi-user mode, runlevel 5 for graphical mode).
-- **Why**: System V provides a structured way to manage services and runlevels, but it is sequential and can be slow during boot.
-
----
-
-### **3. System V Service**
+### **1.1. System V Service**
 - **What**: A service in System V is a program or daemon that runs in the background (e.g., a web server or database).
 - **How**: Services are managed using scripts in `/etc/init.d/`. Commands like `service <name> start` or `/etc/init.d/<name> start` are used to control them.
 - **Why**: Services are essential for running background processes that provide functionality to the system or users.
 
 ---
 
-### **4. Upstart Overview**
+### **2. Upstart Overview**
 - **What**: Upstart is an event-based replacement for System V init, developed by Canonical for Ubuntu.
 - **How**: Instead of relying solely on runlevels, Upstart starts and stops services based on events (e.g., hardware changes, service dependencies).
 - **Why**: Upstart was designed to address the limitations of System V, such as slow boot times and lack of flexibility in handling modern hardware (e.g., hot-pluggable devices).
 
 ---
 
-### **5. Upstart Jobs**
+### **2.1. Upstart Jobs**
 - **What**: Jobs in Upstart are tasks or services that can be started, stopped, or restarted.
 - **How**: Jobs are defined in configuration files located in `/etc/init/`. These files specify how and when a job should run (e.g., start on network-up).
 - **Why**: Upstart jobs provide more flexibility and faster boot times compared to System V scripts.
 
 ---
 
-### **6. Systemd Overview**
+### **3. Systemd Overview**
 - **What**: Systemd is a modern init system and service manager that has largely replaced System V and Upstart in many Linux distributions.
 - **How**: Systemd uses unit files (e.g., `.service`, `.socket`, `.target`) to define and manage services, sockets, mount points, and more. It parallelizes service startup for faster boot times.
 - **Why**: Systemd was created to address the shortcomings of System V and Upstart, offering better performance, dependency management, and advanced features like logging (via `journald`).
 
 ---
 
-### **7. Systemd Goals**
+### **3.1. Systemd Goals**
 - **What**: The primary goals of Systemd are to improve boot performance, simplify service management, and provide a unified way to manage system resources.
 - **How**: Systemd achieves these goals by:
   - Parallelizing service startup.
@@ -858,7 +877,7 @@ The terms **Init** is Initialization where init acts as a **MOTHER OF ALL PROCES
 
 ---
 
-### **8. Power States**
+### **4. Power States**
 - **What**: Power states refer to the different modes a system can be in, such as running, sleeping, or powered off.
 - **How**: Init systems manage power states by controlling which services are running and how the system transitions between states (e.g., shutdown, reboot, suspend).
 - **Why**: Proper management of power states ensures that the system operates efficiently and data is not lost during transitions.
