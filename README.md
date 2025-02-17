@@ -1158,6 +1158,87 @@ logger -s Hello
     
 </details>
 
+---
+
+
+
+## Cron Jobs
+Cron jobs are scheduled tasks in Linux that run at specified intervals. The cron daemon (`crond`) executes these jobs based on time intervals defined in a user's crontab file.
+
+### Checking and Creating Cron Jobs
+- To check the existing cron jobs:
+```bash
+$ cat /etc/crontab
+```
+- To list available cron jobs:
+```bash
+$ crontab -l
+```
+- To create or edit a cron job:
+```bash
+$ crontab -e
+```
+
+### Crontab Syntax
+**A cron job follows the below format:**
+```
+*  *  *  *  *  command_to_execute
+|  |  |  |  |
+|  |  |  |  |____ Day of the week (0 - 6) [Sunday=0]
+|  |  |  |_______ Month (1 - 12)
+|  |  |__________ Day of the month (1 - 31)
+|  |_____________ Hour (0 - 23)
+|_______________ Minute (0 - 59)
+```
+
+### Example Cron Jobs
+1. Run a command at 11:00 AM on the 14th of February (Friday):
+```bash
+0 11 14 2 5 echo "hello" > /tmp/test.txt
+```
+
+2. Run a command at 5:32 AM on the 14th of February (Friday):
+```bash
+32 05 14 2 5 echo "hello" > /tmp/test.txt
+```
+
+3. Run a command at 3:55 PM on the 28th of December:
+```bash
+55 15 28 12 * /usr/bin/echo "hello" > /path/to/file
+```
+
+4. Run a command at 3:44 PM daily:
+```bash
+44 15 * * * echo "test" > /path/to/file
+```
+
+## Running Cron Jobs for Other Users
+- To check root’s cron jobs:
+```bash
+$ sudo crontab -u root -l
+```
+
+- To create or edit a cron job for another user (e.g., `mallick`):
+```bash
+$ crontab -u mallick -e
+```
+
+### Special Time Intervals
+**Cron also supports special time intervals:**
+- `@hourly` – Runs every hour
+- `@daily` – Runs once a day
+- `@monthly` – Runs once a month
+- `@yearly` – Runs once a year
+
+- Example: Run a command every hour:
+```bash
+@hourly /usr/bin/echo "hello" > /path/to/file
+```
+- This ensures the job executes hourly.
+
+---
+
+
 
 
 
