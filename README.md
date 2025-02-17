@@ -806,81 +806,147 @@ The terms **Init** is Initialization where init acts as a **MOTHER OF ALL PROCES
   <summary>Click to check explanation of each, their differences, and their purposes.</summary>
 
 ### **1. System V Overview**
-The main job of **init** is to start and stop essential system processes. To check if you're using Sys V, look for the `/etc/inittab` file. If it exists, you're likely using Sys V.
+System V (Sys V) is a traditional init system in Linux, used to start and stop essential processes sequentially via scripts. It’s identified by the presence of `/etc/inittab`. 
 
-Sys V starts and stops processes in order. For example, if service **foo-a** needs to run before **foo-b**, Sys V ensures this sequence using scripts. These scripts, usually found in `/etc/init.d` or `/etc/rc.d`, handle starting and stopping services.
+**Key Features:**
+- **Runlevels (0-6):** Define system states (e.g., shutdown, single-user, multiuser with/without networking, GUI, reboot).
+- **Scripts:** Located in `/etc/rc.d/rc[runlevel].d/` or `/etc/init.d`, scripts starting with `S` (start) or `K` (kill) execute in sequence during startup/shutdown.
+- **Dependency Management:** Easy to handle since processes start/stop in order (e.g., `foo-a` before `foo-b`).
 
-**Pros**: Easy to manage dependencies (e.g., foo-a before foo-b).  
-**Cons**: Slower performance since processes start/stop one at a time.
+**Pros:** Simple dependency resolution.  
+**Cons:** Poor performance due to sequential execution.
 
-Sys V uses **runlevels** (0-6) to define the system's state:
+**Example:** In runlevel 0 (shutdown), scripts like `K10updates` and `K80openvpn` run to stop services.
 
-- **0**: Shutdown  
-- **1**: Single User Mode  
-- **2**: Multiuser mode without networking  
-- **3**: Multiuser mode with networking  
-- **4**: Unused  
-- **5**: Multiuser mode with networking and GUI  
-- **6**: Reboot  
-
-On startup, the system checks the runlevel and runs scripts in `/etc/rc.d/rc[runlevel].d/` or `/etc/init.d`. Scripts starting with **S** (start) or **K** (kill) run during startup or shutdown, respectively, in numerical order.
-
-For example:
-```
-pete@icebox:/etc/rc.d/rc0.d$ ls
-K10updates  K80openvpn
-```
-This means during shutdown (runlevel 0), the system will first stop the `updates` service, then `openvpn`.
-
-You can find and change the default runlevel in `/etc/inittab`.
-
-**Note**: Sys V is being phased out, but runlevels may still appear in newer init systems to support older Sys V scripts.
+**Note:** Sys V is being phased out but remains relevant for legacy services. Runlevels may appear in newer init systems for compatibility.
 
 ---
 
 ### **1.1. System V Service**
-- **What**: A service in System V is a program or daemon that runs in the background (e.g., a web server or database).
-- **How**: Services are managed using scripts in `/etc/init.d/`. Commands like `service <name> start` or `/etc/init.d/<name> start` are used to control them.
-- **Why**: Services are essential for running background processes that provide functionality to the system or users.
+You can use the `service` command to manage System V services. Here are the basic commands:
+- **List all services**:
+  ```bash
+  service --status-all
+  ```
+- **Start a service**:
+  ```bash
+  sudo service networking start
+  ```
+- **Stop a service**:
+  ```bash
+  sudo service networking stop
+  ```
+- **Restart a service**:
+  ```bash
+  sudo service networking restart
+  ```
+- These commands also work with Upstart services. While Linux is transitioning away from System V init scripts, these commands help ease the shift.
 
 ---
 
 ### **2. Upstart Overview**
-- **What**: Upstart is an event-based replacement for System V init, developed by Canonical for Ubuntu.
-- **How**: Instead of relying solely on runlevels, Upstart starts and stops services based on events (e.g., hardware changes, service dependencies).
-- **Why**: Upstart was designed to address the limitations of System V, such as slow boot times and lack of flexibility in handling modern hardware (e.g., hot-pluggable devices).
+- Upstart, developed by Canonical, was Ubuntu's init system before systemd replaced it. It improved on SysV by allowing event-driven job execution instead of strict, sequential startup processes.
+- To check if Upstart is in use, look for the `/usr/share/upstart` directory. Jobs define actions, while events trigger them. Job configurations are in `/etc/init/`, and an example from `networking.conf` might be:
+  ```  
+  start on runlevel [235]  
+  stop on runlevel [0]  
+  ```
+- The way that Upstart works is that:
+  1. First, it loads up the job configurations from /etc/init
+  2. Once a startup event occurs, it will run jobs triggered by that event.
+  3. These jobs will make new events and then those events will trigger more jobs
+  4. Upstart continues to do this until it completes all the necessary jobs
 
 ---
 
 ### **2.1. Upstart Jobs**
-- **What**: Jobs in Upstart are tasks or services that can be started, stopped, or restarted.
-- **How**: Jobs are defined in configuration files located in `/etc/init/`. These files specify how and when a job should run (e.g., start on network-up).
-- **Why**: Upstart jobs provide more flexibility and faster boot times compared to System V scripts.
+- Upstart manages system jobs and events, but tracking their origins can be tricky. You can control and monitor jobs using these commands:
+1. **List all jobs**:  
+   `initctl list`  
+   Shows job names, goals (e.g., start/stop), and current statuses (e.g., waiting/running).
+2. **Check a specific job's status**:  
+   `initctl status <job_name>`  
+   Example: `initctl status networking` → `networking start/running`.
+3. **Control jobs manually**:  
+   - Start: `sudo initctl start <job_name>`  
+   - Stop: `sudo initctl stop <job_name>`  
+   - Restart: `sudo initctl restart <job_name>`  
+4. **Emit an event**:  
+   `sudo initctl emit <event_name>`
+- Job configurations are in `/etc/init/*.conf`, but you usually won’t need to edit them. Use the commands above to manage jobs directly.
 
 ---
 
 ### **3. Systemd Overview**
-- **What**: Systemd is a modern init system and service manager that has largely replaced System V and Upstart in many Linux distributions.
-- **How**: Systemd uses unit files (e.g., `.service`, `.socket`, `.target`) to define and manage services, sockets, mount points, and more. It parallelizes service startup for faster boot times.
-- **Why**: Systemd was created to address the shortcomings of System V and Upstart, offering better performance, dependency management, and advanced features like logging (via `journald`).
+- Systemd is the modern init system for Linux. If you have `/usr/lib/systemd`, you're using it. It boots your system by achieving "targets" (goals) and their dependencies, offering flexibility and robustness.
+#### Key Points:
+1. **Boot Process**:
+   - Loads configs from `/etc/systemd/system` or `/usr/lib/systemd/system`.
+   - Sets the boot goal, usually `default.target`.
+   - Activates dependencies for the target.
+
+2. **Common Targets**:
+   - `poweroff.target`: Shutdown.
+   - `rescue.target`: Single-user mode.
+   - `multi-user.target`: Multiuser with networking.
+   - `graphical.target`: Multiuser with networking and GUI.
+   - `reboot.target`: Restart.
+
+   `default.target` typically points to `graphical.target`.
+
+3. **Units**:
+  - The main object that systemd works with are known as units. Systemd doesn't just stop and start services, it can mount filesystems, monitor your network sockets, etc and because of that robustness it has different types of units it operates. The most common units are:
+    - **Service units** (`.service`): Manage services.
+    - **Mount units** (`.mount`): Handle filesystem mounts.
+    - **Target units** (`.target`): Group other units.
+- For example, `default.target` may include `networking.service` and `crond.service`, activating all necessary units when booting.
 
 ---
 
 ### **3.1. Systemd Goals**
-- **What**: The primary goals of Systemd are to improve boot performance, simplify service management, and provide a unified way to manage system resources.
-- **How**: Systemd achieves these goals by:
-  - Parallelizing service startup.
-  - Using declarative unit files for configuration.
-  - Providing tools like `systemctl` for service management.
-  - Integrating with other system components (e.g., logging, device management).
-- **Why**: Systemd aims to modernize Linux systems, making them more efficient and easier to manage.
+- A systemd *unit file* defines services, startup order, and dependencies. Here's a simplified example (`foobar.service`):
+
+```ini
+[Unit]
+Description=My Foobar
+Before=bar.target  # Starts before "bar.target"
+
+[Service]
+ExecStart=/usr/bin/foobar  # Command to run the service
+
+[Install]
+WantedBy=multi-user.target  # Auto-starts with this system target
+```
+
+**Key Sections:**
+- **`[Unit]`**: Metadata and startup order rules.
+- **`[Service]`**: Commands to manage the service (start/stop/reload).
+- **`[Install]`**: Dependency rules for enabling/disabling the service.
+
+**Essential Commands:**
+- List active units: `systemctl list-units`
+- Check status: `systemctl status <unit>`
+- Start/Stop/Restart: `systemctl start|stop|restart <unit>`
+- Enable/Disable auto-start: `systemctl enable|disable <unit>`
+
+This is a basic overview; systemd offers advanced features like timers, sockets, and complex dependencies. Use `man systemd` or official documentation for deeper exploration.
 
 ---
 
 ### **4. Power States**
-- **What**: Power states refer to the different modes a system can be in, such as running, sleeping, or powered off.
-- **How**: Init systems manage power states by controlling which services are running and how the system transitions between states (e.g., shutdown, reboot, suspend).
-- **Why**: Proper management of power states ensures that the system operates efficiently and data is not lost during transitions.
+- Power States: Shutdown and Restart Commands
+- To control your system's power state via the command line:
+1. **Shutdown immediately:**  
+   `sudo shutdown -h now`  
+   This halts (powers off) the system.
+2. **Shutdown in X minutes:**  
+   `sudo shutdown -h +X`  
+   Example: `sudo shutdown -h +2` shuts down in 2 minutes.
+3. **Restart immediately:**  
+   `sudo shutdown -r now`  
+   Or simply use:  
+   `sudo reboot`  
+- These commands help manage your system's power state efficiently.
 
 ---
 </details>
