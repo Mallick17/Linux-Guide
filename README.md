@@ -660,11 +660,13 @@ root@ip-172-31-3-50:~# ps -l
 - **User actions**: Like pressing Ctrl-C to interrupt or Ctrl-Z to suspend a process.  
 - **Hardware/software issues**: The kernel notifies processes of problems.  
 - **Inter-process communication**: Signals allow processes to communicate.
+ <br>
 When a signal is generated, it stays **pending** until delivered to the process. Processes can:
 - Ignore the signal.  
 - Catch and handle it with a custom routine.  
 - Terminate the process.  
 - Block the signal (if allowed).
+  <br>
 **Common Signals**:  
 - **SIGHUP (1)**: Hangup.  
 - **SIGINT (2)**: Interrupt (e.g., Ctrl-C).  
@@ -672,6 +674,7 @@ When a signal is generated, it stays **pending** until delivered to the process.
 - **SIGSEGV (11)**: Segmentation fault.  
 - **SIGTERM (15)**: Software termination.  
 - **SIGSTOP**: Stop process.
+ <br>
 Signals are usually referred to by names (e.g., SIGKILL) rather than numbers, as numbers can vary. Some signals, like SIGKILL, cannot be blocked.
 
 
