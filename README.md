@@ -984,6 +984,7 @@ Each system was developed to address the limitations of its predecessor, with Sy
 | CPU Monitoring             | `mpstat`                             | Reports CPU usage statistics                                               | `mpstat 1 5`          |
 | I/O Monitoring             | `iostat`                             | Displays CPU and I/O usage statistics                                      | `iostat -x 1 5`       |
 | Memory Monitoring          | `free -m`                            | Shows memory usage details                                                 | `free -m`             |
+| Additional Memory Monitoring | `vmstat`                            | Reports memory, swap, and CPU statistics                                   | `vmstat 1 5`          |
 | Continuous Monitoring      | `htop`                               | Interactive process monitoring                                             | `htop`                |
 
 
@@ -992,7 +993,7 @@ Each system was developed to address the limitations of its predecessor, with Sy
 
 ### Monitoring Processes with `top`
 
-The `top` command provides a real-time view of system resource usage, helping track active processes and performance metrics.
+- The `top` command provides a real-time view of system resource usage, helping track active processes and performance metrics.
 
 #### Key Information Displayed in `top`
 
@@ -1038,6 +1039,42 @@ The `top` command provides a real-time view of system resource usage, helping tr
 $ top -p <PID>
 ```
 - Use `top` to quickly analyze system performance and manage running processes effectively!
+
+---
+
+### Memory Monitoring with `vmstat`
+The `vmstat` command provides an overview of memory, CPU, and I/O usage.
+
+#### Example Output:
+```bash
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 1  0      0 396528  38816 384036    0    0     4     2   38   79  0  0 99  0  0
+```
+
+#### Fields Explained:
+- **procs**
+  - `r`: Processes waiting to run
+  - `b`: Processes in uninterruptible sleep
+- **memory**
+  - `swpd`: Virtual memory used
+  - `free`: Free memory
+  - `buff`: Memory used as buffers
+  - `cache`: Memory used as cache
+- **swap**
+  - `si`: Memory swapped in from disk
+  - `so`: Memory swapped out to disk
+- **io**
+  - `bi`: Blocks received from block devices
+  - `bo`: Blocks sent to block devices
+- **system**
+  - `in`: Interrupts per second
+  - `cs`: Context switches per second
+- **cpu**
+  - `us`: User time
+  - `sy`: System (kernel) time
+  - `id`: Idle time
+  - `wa`: I/O wait time
 
 </details>
 
