@@ -1076,6 +1076,34 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
   - `id`: Idle time
   - `wa`: I/O wait time
 
+---
+
+### CPU & Disk Monitoring with `iostat`
+The `iostat` command provides CPU and disk usage statistics.
+
+#### Example Output:
+```bash
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.13    0.03    0.50    0.01    0.00   99.33
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               0.17         3.49         1.92     385106     212417
+```
+
+#### Fields Explained:
+- **CPU Usage**
+  - `%user`: CPU usage by user processes
+  - `%nice`: CPU usage by niced processes
+  - `%system`: CPU usage by system processes
+  - `%iowait`: Time spent waiting for I/O
+  - `%steal`: Time stolen by the hypervisor in VMs
+  - `%idle`: Idle CPU time
+- **Disk Usage**
+  - `tps`: Transfers per second
+  - `kB_read/s`: Data read per second
+  - `kB_wrtn/s`: Data written per second
+  - `kB_read`: Total data read
+  - `kB_wrtn`: Total data written
 </details>
 
 
