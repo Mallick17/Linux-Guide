@@ -767,26 +767,26 @@ Packages are collections of files (like programs, libraries, and documentation) 
 <details>
   <summary>Click to view Detailed Explaination of Software Distribution, Package Repositories, Package Dependencies, rpm and dpkg, yum and apt & Compile Source Code.</summary>
 
-**Software Distribution**
+### **Software Distribution**
 - Your system uses **packages** (like Chrome or Photoshop) which are collections of files compiled into one. These are managed by **package managers** that install and update software. Most packages come in **.deb** (Debian/Ubuntu) or **.rpm** (Red Hat/Fedora) formats. Developers (upstream providers) create the software, and **package maintainers** review and distribute it.
 
-**Package Repositories**  
+### **Package Repositories**  
 - Instead of downloading packages manually, you can use **repositories**—central locations storing packages online. Your system knows where to find these repositories through a sources file (e.g., `/etc/apt/sources.list` on Debian). For example, if a repository hosts `WackyWidgets` software, you can add its link to your sources file to access its packages.
 
-**Package Dependencies**  
+### **Package Dependencies**  
 - Packages often rely on other packages or **shared libraries** to function. If dependencies are missing, the package won’t work. Think of it like restaurants depending on a farm for ingredients—without the farm, they can’t operate.
 
-**Package Management Tools**  
+### **Package Management Tools**  
 - **.deb** (Debian): Use `dpkg` to install (`dpkg -i package.deb`) or remove (`dpkg -r package.deb`) packages.  
 - **.rpm** (Red Hat): Use `rpm` to install (`rpm -i package.rpm`) or remove (`rpm -e package.rpm`) packages.  
 - However, these tools don’t handle dependencies automatically, which is where **package management systems** like `apt` (Debian) and `yum` (Red Hat) come in. They handle installation, removal, and dependency resolution.
 
-**Common Commands**  
+### **Common Commands**  
 - Install: `apt install package` (Debian) or `yum install package` (Red Hat).  
 - Remove: `apt remove package` or `yum erase package`.  
 - Update: `apt update; apt upgrade` or `yum update`.  
 
-**Compiling Source Code**  
+### **Compiling Source Code**  
 Sometimes, you’ll need to compile software from source code. Here’s how:  
 1. Install build tools: `sudo apt install build-essential`.  
 2. Extract the source: `tar -xzvf package.tar.gz`.  
