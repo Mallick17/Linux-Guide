@@ -20,7 +20,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
  ## Linux Architecture
  - The Linux kernel is monolithic, meaning it operates in a single address space. It’s composed of several components: process management for executing processes, memory management for efficient memory allocation and use, device drivers for managing hardware interaction, system calls as interfaces for requesting services from the kernel, and file system management.
  - A Linux system is divided into three main parts:
-   - **Hardware** - This includes all the hardware that your system runs on as well as memory, CPU, disks, etc.
+   - **Hardware** - This includes all the hardware that our system runs on as well as memory, CPU, disks, etc.
    - **Linux Kernel** - As we discussed above, the kernel is the core of the operating system. It manages the hardware and tells it how to interact with the system.
    - **User Space** - This is where users like us will be directly interacting with the system.
 ![Linux-Architecture](https://github.com/user-attachments/assets/5d029620-9d08-40f6-9f10-d301c387a52e)
@@ -35,10 +35,10 @@ Linux is an open-source operating system (OS) that's used in many industries and
    - Sitting directly above the hardware, the kernel is the core of the Linux operating system. It acts as a bridge between the hardware and software layers. The kernel manages critical tasks like memory allocation, process scheduling, device communication (via drivers), and file system operations. It directly interacts with the hardware to execute low-level operations, ensuring efficient resource utilization and system stability. For example, when a program needs to read a file, the kernel handles the request by communicating with the storage hardware.
 
 3. **Shell**
-   - The shell is a command-line interface (CLI) or scripting environment that allows users to interact with the kernel. It acts as an intermediary, translating user commands into actions the kernel can execute. For instance, when you type a command like `ls` to list files, the shell interprets this command and sends a request to the kernel. The kernel then interacts with the hardware (e.g., the hard drive) to fetch the required data and returns the results to the shell, which displays them to the user. Popular shells like **bash**, **zsh**, and **csh** offer different features and scripting capabilities.
+   - The shell is a command-line interface (CLI) or scripting environment that allows users to interact with the kernel. It acts as an intermediary, translating user commands into actions the kernel can execute. For instance, when we type a command like `ls` to list files, the shell interprets this command and sends a request to the kernel. The kernel then interacts with the hardware (e.g., the hard drive) to fetch the required data and returns the results to the shell, which displays them to the user. Popular shells like **bash**, **zsh**, and **csh** offer different features and scripting capabilities.
 
 4. **Applications**
-   - Applications are the software programs users interact with directly, such as web browsers, text editors, or file managers. These applications rely on the kernel to access hardware resources and the shell to execute commands or scripts. For example, when you open a file in a text editor, the application sends a request to the kernel via the shell. The kernel retrieves the file from the hardware (e.g., the hard drive) and passes it back to the application, which then displays it to the user.
+   - Applications are the software programs users interact with directly, such as web browsers, text editors, or file managers. These applications rely on the kernel to access hardware resources and the shell to execute commands or scripts. For example, when we open a file in a text editor, the application sends a request to the kernel via the shell. The kernel retrieves the file from the hardware (e.g., the hard drive) and passes it back to the application, which then displays it to the user.
   
 </details>
 
@@ -116,7 +116,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 | /boot     | Contains kernel boot loader files. |
 | /dev      | Device files. |
 | /etc      | Core system configuration directory, should hold only configuration files and not any binaries. |
-| /home     | Personal directories for users, holds your documents, files, settings, etc. |
+| /home     | Personal directories for users, holds our documents, files, settings, etc. |
 | /lib      | Holds library files that binaries can use. |
 | /media    | Used as an attachment point for removable media like USB drives. |
 | /mnt      | Temporarily mounted filesystems. |
@@ -127,7 +127,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 | /sbin     | Contains essential system binaries, usually can only be run by root. |
 | /srv      | Site-specific data which are served by the system. |
 | /tmp      | Storage for temporary files. |
-| /usr      | User-installed software and utilities, however, that is not to say you can't add personal directories in there. Inside this directory are sub-directories for `/usr/bin`, `/usr/local`, etc. |
+| /usr      | User-installed software and utilities, however, that is not to say we can't add personal directories in there. Inside this directory are sub-directories for `/usr/bin`, `/usr/local`, etc. |
 | /var      | Variable directory, it's used for system logging, user tracking, caches, etc. Basically anything that is subject to change all the time. |
 
 ###  Common Desktop Filesystem Types
@@ -173,7 +173,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
   - Where partitions start and end.  
   - Which partitions are bootable.  
   - Which disk sectors belong to which partition.
-  - You can have multiple partitions on a disk and they can't overlap each other. If there is space that is not allocated to a partition, then it is known as free space. 
+  - we can have multiple partitions on a disk and they can't overlap each other. If there is space that is not allocated to a partition, then it is known as free space. 
 - Two main types: **MBR** (old) and **GPT** (new).  
 
 
@@ -187,7 +187,7 @@ Linux is an open-source operating system (OS) that's used in many industries and
 
 #### **3. GPT (GUID Partition Table)**  
 - **Modern standard**.  
-- No partition type nonsense—just create as many partitions as you need.  
+- No partition type nonsense—just create as many partitions as we need.  
 - Each partition gets a **globally unique ID (GUID)**.  
 - Works best with **UEFI-based booting**.  
 
@@ -213,7 +213,7 @@ A filesystem is more than just files and directories. Here's the breakdown:
 4. **Data Blocks**:  
    - Where the actual **file data** and **directory structures** live.  
 
-- **Check out Disk Partition on your machine:**
+- **Check out Disk Partition on our machine:**
   ```sh
   [root@rhel ~]# parted -l
   Model: Xen Virtual Block Device (xvd)
@@ -237,14 +237,14 @@ A filesystem is more than just files and directories. Here's the breakdown:
   - **`parted`**: A versatile command-line tool that supports both MBR (Master Boot Record) and GPT partitioning.
   - **`gparted`**: The GUI version of `parted`, ideal for users who prefer a graphical interface.
   - **`gdisk`**: Similar to `fdisk`, but it **only supports GPT** (no MBR).
-- Partitioning a disk is a straightforward process with the right tools. Using `parted`, you can:
+- Partitioning a disk is a straightforward process with the right tools. Using `parted`, we can:
 1. Select the target device.
 2. View the current partition table.
 3. Create new partitions with specific start and end points.
 4. Verify and save changes.
 
 ### **Step 1: Launch `parted`**
-Open your terminal and launch `parted` with root privileges:
+Open our terminal and launch `parted` with root privileges:
 
 ```bash
 $ sudo parted
@@ -336,7 +336,7 @@ Number  Start   End     Size    File system  Name  Flags
 ---
 
 ### **Step 6: Exit `parted`**
-Once you're done, exit the `parted` shell:
+Once we're done, exit the `parted` shell:
 
 ```bash
 (parted) quit
@@ -345,15 +345,15 @@ Once you're done, exit the `parted` shell:
 **Output:**
 
 ```
-Information: You may need to update /etc/fstab.
+Information: we may need to update /etc/fstab.
 ```
 
 ### **Step 7: Resize a Partition**
-- You can also resize a partition if you don't have any space.
+- we can also resize a partition if we don't have any space.
 ```bash
 resize 2 1245 3456
 ```
-- Select the partition number and then the start and end points of where you want to resize it to.
+- Select the partition number and then the start and end points of where we want to resize it to.
 
 ### **Creating A Filesystems**
 - Command to make a file system in the partitioned disk
@@ -458,7 +458,7 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 
 ## **4. Unmount the Partition**
 
-When you're done using the partition, unmount it using the `umount` command:
+When we're done using the partition, unmount it using the `umount` command:
 
 ```bash
 ubuntu@ip-172-31-3-50:~$ sudo umount /home/ubuntu/mydrive
@@ -612,12 +612,12 @@ TARGET                SOURCE    FSTYPE   OPTIONS
 
 ---
 ## Processes
-- Processes are the programs that are running on your machine. They are managed by the kernel and each process has an ID associated with it called the process ID (PID). This PID is assigned in the order that processes are created.
+- Processes are the programs that are running on our machine. They are managed by the kernel and each process has an ID associated with it called the process ID (PID). This PID is assigned in the order that processes are created.
 ```bash
 root@ip-172-31-3-50:~# ps
 ```
 ![image](https://github.com/user-attachments/assets/f5bad342-3705-402e-a8af-9265899d1f44)
-- This shows you a quick snapshot of the current processes:
+- This shows we a quick snapshot of the current processes:
   - PID: Process ID
   - TTY: Controlling terminal associated with the process (we'll go in detail about this later)
   - STAT: Process status code
@@ -642,7 +642,7 @@ root@ip-172-31-3-50:~# ps
     
 ### Process Creation
 - Process creation involves cloning an existing process using the `fork` system call, which creates a child process with a new Process ID (PID). The original process becomes the parent, identified by a Parent Process ID (PPID). The child can either continue running the parent's program or use the `execve` system call to start a new program, replacing its memory setup.
-- For example, when you run `ps l` in your terminal, the shell (e.g., `bash`) is the parent process, and `ps l` is its child, sharing the shell's PID as its PPID.
+- For example, when we run `ps l` in our terminal, the shell (e.g., `bash`) is the parent process, and `ps l` is its child, sharing the shell's PID as its PPID.
 - The first process, `init` (PID 1), is created during system boot. It spawns all other processes, runs with root privileges, and cannot be terminated until the system shuts down. This "mother of all processes" ensures the system runs smoothly.
 ```bash
 root@ip-172-31-3-50:~# ps -l
@@ -675,8 +675,88 @@ root@ip-172-31-3-50:~# ps -l
   - **SIGSTOP**: Stop process.
 - Signals are usually referred to by names (e.g., SIGKILL) rather than numbers, as numbers can vary. Some signals, like SIGKILL, cannot be blocked.
 
+### Kill (Terminate)
+- The `kill` command terminates processes using signals. For example:
+  - `kill 12445` sends a **SIGTERM** signal (default), asking the process to exit gracefully.
+  - `kill -9 12445` sends a **SIGKILL** signal, forcing the process to stop immediately without cleanup.
+- **Key Signals:**
+  - **SIGHUP**: Sent when the terminal closes (e.g., closing a window).
+  - **SIGINT**: Interrupts the process (e.g., using `Ctrl+C`).
+  - **SIGTERM**: Requests a graceful termination with cleanup.
+  - **SIGKILL**: Forces an immediate stop (no cleanup).
+  - **SIGSTOP**: Pauses/suspends a process.
 
-  
+### niceness
+- When we run multiple programs on our computer, they don’t actually run simultaneously. Instead, the CPU gives each process a small time slice, switching between them quickly. The kernel manages this process scheduling, ensuring each program gets fair CPU time.
+- However, we can influence this with **niceness**, a priority value for processes. A high niceness (positive number) means lower priority (being "nice" to others), while a low or negative niceness means higher priority (grabbing more CPU time).
+- You can check niceness in the `NI` column using the `top` command. To set niceness:
+  - Use `nice` for new processes:  
+    `nice -n 5 apt upgrade`  
+  - Use `renice` for existing processes:  
+    `renice 10 -p 3245`
+  - This lets us control how much CPU time a process gets.
+
+### Process States
+- When you run `ps aux`, the **STAT** column shows process states. Common states include:
+  - **R**: Running or ready to run (waiting for CPU).
+  - **S**: Sleeping, waiting for an event (e.g., user input).
+  - **D**: Uninterruptible sleep (can't be killed; often requires a reboot).
+  - **Z**: Zombie process (terminated but waiting for status cleanup).
+  - **T**: Stopped or suspended process.
+
+### /proc Filesystem
+- The `/proc` filesystem in Linux stores process information, treating each process as a file. Each process has a directory named by its PID (Process ID) under `/proc`. For example, to view details of a process with PID 12345, you can use:
+  ```bash
+  cat /proc/12345/status
+  ```
+- This provides detailed process state and other kernel-level information, offering more insights than tools like `ps`.
+
+### Job Control
+If you're running a long command in a terminal and want to keep using the shell, you can manage processes using job control.
+
+1. **Run a Command in the Background**:  
+   Add `&` to the end of a command to run it in the background:  
+   ```bash
+   $ sleep 1000 &
+   ```
+
+2. **View Background Jobs**:  
+   Use `jobs` to see running background jobs:  
+   ```bash
+   $ jobs
+   ```
+   Output:  
+   ```
+   [1]  Running  sleep 1000 &
+   [2]- Running  sleep 1001 &
+   [3]+ Running  sleep 1002 &
+   ```
+   - `+`: Most recent job.  
+   - `-`: Second most recent job.
+
+3. **Send a Running Job to the Background**:  
+   Suspend the job with `Ctrl-Z`, then use `bg` to send it to the background:  
+   ```bash
+   $ sleep 1003
+   ^Z
+   [4]+ Stopped  sleep 1003
+   $ bg
+   [4]+ sleep 1003 &
+   ```
+
+4. **Bring a Job to the Foreground**:  
+   Use `fg` with the job ID (e.g., `%1`):  
+   ```bash
+   $ fg %1
+   ```
+
+5. **Kill a Background Job**:  
+   Use `kill` with the job ID:  
+   ```bash
+   $ kill %1
+   ```
+This lets us manage tasks without interrupting your workflow.
+
 </details>
 
 ---
