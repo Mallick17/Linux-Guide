@@ -641,7 +641,9 @@ root@ip-172-31-3-50:~# ps
   - And basically everything else
     
 ### Process Creation
-- When a new process is created, an existing process clones itself using the fork system call. This creates a nearly identical child process with a new process ID (PID), while the original process becomes its parent, identified by a parent process ID (PPID). The child process can either continue running the same program as the parent or, more commonly, use the execve system call to load a new program. execve replaces the current memory management setup with a new one for the program being launched.
+- Process creation involves cloning an existing process using the `fork` system call, which creates a child process with a new Process ID (PID). The original process becomes the parent, identified by a Parent Process ID (PPID). The child can either continue running the parent's program or use the `execve` system call to start a new program, replacing its memory setup.
+- For example, when you run `ps l` in your terminal, the shell (e.g., `bash`) is the parent process, and `ps l` is its child, sharing the shell's PID as its PPID.
+- The first process, `init` (PID 1), is created during system boot. It spawns all other processes, runs with root privileges, and cannot be terminated until the system shuts down. This "mother of all processes" ensures the system runs smoothly.
 ```bash
 root@ip-172-31-3-50:~# ps -l
 ```
