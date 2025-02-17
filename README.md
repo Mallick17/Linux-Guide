@@ -971,6 +971,75 @@ Each system was developed to address the limitations of its predecessor, with Sy
 
 ---
 
+## Process Utilization
+
+### Process Utilization Commands
+
+| **Topic**                  | **Command**                          | **Description**                                                                 | **Example**           |
+|----------------------------|--------------------------------------|-----------------------------------------------------------------------------|-----------------------|
+| Tracking processes         | `top`                                | Displays real-time system resource usage                                    | `top`                 |
+| Listing open files         | `lsof`                               | Lists open files and the processes using them                              | `lsof -i :80`         |
+| Checking file usage        | `fuser`                              | Identifies processes using a specific file                                 | `fuser /var/log/syslog` |
+| Process threads            | `ps -eLf`                            | Displays detailed thread information                                       | `ps -eLf | grep java` |
+| CPU Monitoring             | `mpstat`                             | Reports CPU usage statistics                                               | `mpstat 1 5`          |
+| I/O Monitoring             | `iostat`                             | Displays CPU and I/O usage statistics                                      | `iostat -x 1 5`       |
+| Memory Monitoring          | `free -m`                            | Shows memory usage details                                                 | `free -m`             |
+| Continuous Monitoring      | `htop`                               | Interactive process monitoring                                             | `htop`                |
+
+
+<details>
+  <summary>Click to check explanation of COmmands Used</summary>
+
+### Monitoring Processes with `top`
+
+The `top` command provides a real-time view of system resource usage, helping track active processes and performance metrics.
+
+#### Key Information Displayed in `top`
+
+#### 1. System Overview (First Line)
+- **Current Time**: System time
+- **Uptime**: How long the system has been running
+- **Users**: Number of logged-in users
+- **Load Average**: System workload over 1, 5, and 15 minutes
+
+#### 2. Task Summary (Second Line)
+- **Total Tasks**: Number of processes
+- **Running**: Active processes
+- **Sleeping**: Inactive but waiting
+- **Stopped & Zombie**: Terminated or waiting for cleanup
+
+#### 3. CPU Usage (Third Line)
+- **us**: User processes CPU time
+- **sy**: System (kernel) CPU time
+- **ni**: Niced (priority-adjusted) CPU time
+- **id**: Idle CPU time
+- **wa**: I/O wait time
+- **hi & si**: Hardware & software interrupt time
+- **st**: Stolen CPU time (for virtual machines)
+
+#### 4. Memory & Swap Usage (Fourth & Fifth Line)
+- **Total, Used, Free**: Memory and swap statistics
+- **Buffers & Cached**: Memory reserved for system operations
+
+#### Process List (Columns Explained)
+- **PID**: Process ID
+- **USER**: Owner of the process
+- **PR & NI**: Priority & nice value
+- **VIRT & RES**: Virtual & physical memory usage
+- **SHR**: Shared memory usage
+- **S**: Process state (R=Running, S=Sleeping, Z=Zombie, etc.)
+- **%CPU & %MEM**: CPU & memory usage percentage
+- **TIME+**: Total process runtime
+- **COMMAND**: Process name
+
+#### Tracking Specific Processes
+- To monitor a particular process by ID:
+```bash
+$ top -p <PID>
+```
+- Use `top` to quickly analyze system performance and manage running processes effectively!
+
+</details>
 
 
 
