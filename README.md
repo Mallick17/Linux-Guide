@@ -625,7 +625,7 @@ root@ip-172-31-3-50:~# ps
   - CMD: Name of executable/command
 
 <details>
-  <summary>Click to view Detailed Explaination Controlling Terminal, Processes Details, Process Creation, Process Termination, Signals, Signal Process, Common Signals</summary>
+  <summary>Click to view Detailed Explaination Controlling Terminal, Processes Details, Process Creation, Process Termination, Signals, Signal Process, Common Signals, Job Control</summary>
 
 ### Controlling Terminal (TTY)
 - TTY is the terminal that executed the command.
