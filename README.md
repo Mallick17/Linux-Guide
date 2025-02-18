@@ -199,6 +199,7 @@ BSD (Berkeley Software Distribution) operating systems use variants of the BSD k
 - Each kernel is designed with specific goals in mind, such as performance, security, or real-time capabilities, and is tailored to the needs of its respective operating system and user base.
 
 </details>
+
 ---
 
  ## Linux Architecture
