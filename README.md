@@ -1439,6 +1439,8 @@ The Task Scheduler offers a wide range of options for scheduling tasks to run at
 - 
 
 
+<details>
+  <summary>Theoritcal Execution Steps</summary>
 
 Got it! Your cron line:
 
@@ -1551,3 +1553,346 @@ Unregister-ScheduledTask -TaskName 'WriteHelloCronEquivalent' -Confirm:$false
   ```
 
 If you want me to tailor the “today” run to an exact time (e.g., **20 Aug 2025, 15:10 IST**) just say the time you want and I’ll drop in the exact command.
+
+
+---
+---
+
+Nice — I’ll give you a concrete, copy-pasteable **test plan + PowerShell script + step-by-step commands** so you can verify the scheduled task (Windows “cron”) will run your `aws s3 sync` reliably in **all** important cases (success, network failure, bad creds, bucket missing, concurrent runs, interrupted transfer, dry-run, etc).
+
+I’ll include:
+
+* a robust `s3sync.ps1` you save and schedule,
+* how to run it manually and as a Scheduled Task,
+* a set of test cases (how to simulate each and what to look for),
+* quick commands to inspect task state and logs.
+
+---
+
+# 1) Prerequisites (quick)
+
+1. Install AWS CLI v2 and ensure `aws` is in PATH. Check:
+
+```powershell
+aws --version
+```
+
+2. Configure a safe, minimal-permission AWS profile for the scheduled job:
+
+```powershell
+aws configure --profile mysync
+# enter access key, secret, region
+```
+
+3. Make folders:
+
+```powershell
+New-Item -ItemType Directory -Path C:\scripts -Force
+New-Item -ItemType Directory -Path C:\Logs\s3sync -Force
+New-Item -ItemType Directory -Path C:\Temp -Force
+```
+
+4. Set execution policy if scripts blocked (run as Admin if needed):
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
+```
+
+---
+
+# 2) Script to run (save as `C:\scripts\s3sync.ps1`)
+
+This script:
+
+* logs start/end and output to timestamped logs,
+* implements a simple lock to avoid concurrent runs,
+* retries with exponential backoff,
+* supports `-DryRun` to test without uploading.
+
+Save exactly (copy/paste):
+
+```powershell
+Param(
+  [string]$Source = "C:\data",
+  [string]$Bucket = "s3://my-bucket/path",
+  [string]$Profile = "mysync",
+  [switch]$DryRun,
+  [int]$MaxAttempts = 3,
+  [int]$BaseDelaySeconds = 10
+)
+
+# Log file
+$logDir = "C:\Logs\s3sync"
+if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force | Out-Null }
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$log = Join-Path $logDir "s3sync_$timestamp.log"
+
+"=== s3 sync start: $(Get-Date -Format o) ===" | Tee-Object -FilePath $log -Append
+
+# Locate aws CLI
+$awsPath = (Get-Command aws -ErrorAction SilentlyContinue).Source
+if (-not $awsPath) {
+  "ERROR: aws CLI not found in PATH. Install AWS CLI v2 and ensure it's in PATH." | Tee-Object -FilePath $log -Append
+  exit 10
+}
+
+# Simple locking (prevents concurrent runs)
+$lock = "C:\Temp\s3sync.lock"
+if (Test-Path $lock) {
+  "Another instance detected (lock file present). Exiting." | Tee-Object -FilePath $log -Append
+  exit 2
+}
+New-Item -ItemType File -Path $lock -Force | Out-Null
+
+$attempt = 0
+$exitCode = 1
+while ($attempt -lt $MaxAttempts) {
+  $attempt++
+  $args = @("s3","sync",$Source,$Bucket,"--exact-timestamps","--delete")
+  if ($DryRun) { $args += "--dryrun" }
+  if ($Profile) { $args += @("--profile",$Profile) }
+
+  "Attempt $attempt: aws $($args -join ' ')" | Tee-Object -FilePath $log -Append
+  & $awsPath @args 2>&1 | Tee-Object -FilePath $log -Append
+  $exitCode = $LASTEXITCODE
+  "Exit code: $exitCode" | Tee-Object -FilePath $log -Append
+
+  if ($exitCode -eq 0) { break }
+
+  $sleep = [int]($BaseDelaySeconds * [math]::Pow(2, $attempt - 1))
+  "Sleeping $sleep seconds before retry..." | Tee-Object -FilePath $log -Append
+  Start-Sleep -Seconds $sleep
+}
+
+# Remove lock and finish
+Remove-Item $lock -Force -ErrorAction SilentlyContinue
+"=== s3 sync finished: $(Get-Date -Format o) ExitCode=$exitCode ===" | Tee-Object -FilePath $log -Append
+
+exit $exitCode
+```
+
+**Notes:**
+
+* Put the correct `$Source`, `$Bucket`, and `$Profile` when calling the script.
+* `--exact-timestamps` + `--delete` are common safe options for sync; remove if you need different behavior.
+* Logs go to `C:\Logs\s3sync\`.
+
+---
+
+# 3) Quick manual test (before scheduling)
+
+1. Dry-run (no changes):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\scripts\s3sync.ps1" -Source "C:\testsrc" -Bucket "s3://my-bucket/test" -Profile "mysync" -DryRun
+```
+
+Check the newest log:
+
+```powershell
+Get-ChildItem C:\Logs\s3sync\*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content -Tail 200
+```
+
+2. Real run (upload small sample):
+
+```powershell
+New-Item -ItemType File -Path C:\testsrc\hello.txt -Force -Value "hello $(Get-Date)"
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\scripts\s3sync.ps1" -Source "C:\testsrc" -Bucket "s3://my-bucket/test" -Profile "mysync"
+```
+
+Verify on S3:
+
+```powershell
+aws s3 ls s3://my-bucket/test --profile mysync
+```
+
+---
+
+# 4) Create a Scheduled Task (the "cron" equivalent)
+
+Example: run daily at 05:32. Replace time or create trigger as needed.
+
+```powershell
+$script = "C:\scripts\s3sync.ps1"
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`" -Source `"C:\testsrc`" -Bucket `"s3://my-bucket/test`" -Profile `"mysync`""
+$trigger = New-ScheduledTaskTrigger -Daily -At 05:32
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive
+Register-ScheduledTask -TaskName "S3SyncDaily" -Action $action -Trigger $trigger -Principal $principal -Description "Daily S3 sync"
+```
+
+If you want to test immediately, create a one-shot trigger for a few minutes from now:
+
+```powershell
+$runAt = (Get-Date).AddMinutes(3)
+$triggerOnce = New-ScheduledTaskTrigger -Once -At $runAt
+Register-ScheduledTask -TaskName "S3Sync_OneOffTest" -Action $action -Trigger $triggerOnce -Principal $principal -Description "One off test"
+```
+
+Start it manually:
+
+```powershell
+Start-ScheduledTask -TaskName "S3Sync_OneOffTest"
+```
+
+---
+
+# 5) How to check task status & results (like `ps | grep`)
+
+Get basic info:
+
+```powershell
+Get-ScheduledTask -TaskName "S3SyncDaily" | Select-Object TaskName, State
+Get-ScheduledTaskInfo -TaskName "S3SyncDaily" | Select-Object LastRunTime, NextRunTime, LastTaskResult
+```
+
+* `LastTaskResult` is the task exit code (0 = success).
+* To view recent logs (tail):
+
+```powershell
+Get-ChildItem C:\Logs\s3sync\*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content -Tail 200
+```
+
+See currently running scheduled tasks:
+
+```powershell
+Get-ScheduledTask | Where-Object State -eq 'Running' | Select-Object TaskName
+```
+
+If you prefer an ad-hoc “grep” by name:
+
+```powershell
+Get-ScheduledTask | Where-Object TaskName -match 'S3Sync' | Select-Object TaskName, State
+```
+
+---
+
+# 6) Test cases — how to simulate & expected results
+
+**A. Dry-run (safety)**
+
+* Command: use `-DryRun` param (see manual test).
+* Expect: log contains `--dryrun` and no S3 changes, exit code `0`.
+
+**B. Normal success**
+
+* Create a small test file, run script.
+* Expect: exit code `0`, log includes upload lines, `aws s3 ls` shows file.
+
+**C. Credentials / permission failure**
+
+* Simulate: run script with `-Profile bogusprofile` or temporarily empty env creds:
+
+  ```powershell
+  powershell -NoProfile -ExecutionPolicy Bypass -File "C:\scripts\s3sync.ps1" -Source C:\testsrc -Bucket s3://my-bucket/test -Profile bogusprofile
+  ```
+* Expect: non-zero exit code; log shows credential error or AccessDenied. ScheduledTask `LastTaskResult` non-zero.
+
+**D. Bucket not found**
+
+* Simulate: set Bucket to `s3://this-bucket-does-not-exist-$(Get-Random)` and run.
+* Expect: non-zero exit code; log shows NoSuchBucket / 404.
+
+**E. Network failure (simulate safely)**
+
+* Simulate without disabling NIC by using an invalid endpoint:
+
+  * Edit invocation in script or call:
+
+  ```powershell
+  & aws s3 sync C:\testsrc s3://my-bucket/test --profile mysync --endpoint-url http://127.0.0.1:1
+  ```
+
+  * Or add `--endpoint-url http://127.0.0.1:1` to the script args temporarily.
+* Expect: connection errors in log, non-zero exit, script retries (you’ll see attempts and backoff).
+
+**F. Interrupted large upload / resume**
+
+* Create a big file:
+
+  ```powershell
+  fsutil file createnew C:\testsrc\bigfile.bin 200000000
+  ```
+* Start the script manually; while running, kill the aws process:
+
+  ```powershell
+  Get-Process -Name aws | Stop-Process -Force
+  ```
+* Re-run script; verify the subsequent run either finishes or resumes (AWS CLI uses multipart for big files; re-run will complete upload). Check logs and `aws s3 ls`.
+
+**G. Concurrent runs**
+
+* Start the task twice (Start-ScheduledTask twice) or run script in two shells. The second should exit quickly with the lock message:
+
+```powershell
+Start-ScheduledTask -TaskName "S3SyncDaily"
+Start-ScheduledTask -TaskName "S3SyncDaily"
+# or run script twice manually to test the lock
+```
+
+* Expect: one instance does work, second sees `Another instance detected` and exits with code `2`.
+
+**H. Full cycle as scheduled task**
+
+* Create the scheduled task as above with a one-off trigger a few minutes from now, then confirm:
+
+```powershell
+Get-ScheduledTaskInfo -TaskName "S3Sync_OneOffTest"
+# after run
+Get-ScheduledTaskInfo -TaskName "S3Sync_OneOffTest" | Select LastRunTime, LastTaskResult
+```
+
+* Check the log file for full output.
+
+---
+
+# 7) Useful troubleshooting snippets
+
+* Show last 50 lines of latest log:
+
+```powershell
+Get-ChildItem C:\Logs\s3sync\*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1 |
+  Get-Content -Tail 50
+```
+
+* See scheduled task event log (Task Scheduler operational events):
+
+```powershell
+Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 50 |
+  Where-Object {$_.Message -match "S3SyncDaily"} | Select-Object TimeCreated, Id, Message -First 10
+```
+
+* If `LastTaskResult` ≠ 0, open the corresponding script log — it will contain exit code + aws error text.
+
+---
+
+# 8) Best practices / production tips
+
+* Run task under a user account that has the AWS profile stored, or pass credentials securely (avoid plaintext in script). For EC2 use instance profile.
+* Use a dedicated, least-privilege IAM user with only the needed S3 permissions.
+* Keep logs for a retention window and periodically archive or rotate them.
+* Add monitoring/alerting: you can add a final check that, on non-zero exit, writes an event to Windows Event Log or sends an alert (SMTP/webhook).
+* Keep lock file on a local fast volume. Remove stale locks (with timestamp checks) if needed.
+
+---
+
+# 9) Quick checklist to run now
+
+1. Put `s3sync.ps1` into `C:\scripts\`.
+2. `aws configure --profile mysync` with test keys.
+3. Create `C:\testsrc` and add `hello.txt`.
+4. Manual dry-run: run script with `-DryRun`. Inspect log.
+5. Manual real run: run script normally. Inspect log and `aws s3 ls`.
+6. Create one-off scheduled task (run in 3 minutes). Start and confirm `LastRunTime` + `LastTaskResult`.
+7. Run the test cases above (bad profile, bad bucket, endpoint override, concurrent runs). Inspect logs each time.
+
+---
+
+If you want, I can:
+
+* generate the exact Register-ScheduledTask command with your real `$Source`, `$Bucket`, and desired schedule, or
+* produce a small wrapper that also emails you on failure (SMTP) or posts to Slack/Teams.
+
+Tell me which one you want and I’ll give the exact command to paste.
+
+
+</details>
