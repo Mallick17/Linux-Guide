@@ -3106,3 +3106,111 @@ We can make the **log file rotate daily in CMD** (like `s3sync_20250820.log`) so
 
 
 </details>  
+
+---
+
+### Clean, Minimal and Follows Best Practices using CMD extra features Log File
+
+<details>
+  <summary>Clean steps with logs</summary>
+
+
+### ✅ 1. Configure AWS once (so no credential issues later)
+
+Open **CMD** and run:
+
+```cmd
+aws configure
+```
+
+It will ask you:
+
+```
+AWS Access Key ID [None]: <your-access-key>
+AWS Secret Access Key [None]: <your-secret-key>
+Default region name [None]: ap-south-1
+Default output format [None]: json
+```
+
+This saves credentials in:
+
+```
+C:\Users\<YourUsername>\.aws\credentials
+C:\Users\<YourUsername>\.aws\config
+```
+
+➡️ After this step, every `aws` command (from CMD, Task Scheduler, or batch file) will automatically use your saved credentials. No need to hardcode them anywhere.
+
+---
+
+### ✅ 2. Create daily rotating logs (date + time)
+
+Update your batch file `C:\scripts\s3sync.bat`:
+
+```bat
+@echo off
+set LOGDIR=C:\Logs
+if not exist %LOGDIR% mkdir %LOGDIR%
+
+:: Format: YYYYMMDD_HHMMSS
+set DATETIME=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%_%TIME:~0,2%%TIME:~3,2%%TIME:~6,2%
+set DATETIME=%DATETIME: =0%
+
+set LOGFILE=%LOGDIR%\s3sync_%DATETIME%.log
+
+echo Starting sync at %DATETIME% > %LOGFILE%
+aws s3 sync "C:\Data\Reports" "s3://my-company-backups/reports/" >> %LOGFILE% 2>&1
+echo Finished sync at %DATETIME% >> %LOGFILE%
+```
+
+📝 Explanation:
+
+* `%DATE%` → system date → reformatted to `YYYYMMDD`
+* `%TIME%` → system time → reformatted to `HHMMSS` (adds leading `0` if needed)
+* Every run creates a unique log:
+
+  ```
+  C:\Logs\s3sync_20250820_053200.log
+  ```
+
+---
+
+### ✅ 3. Schedule the daily sync (with logs handled inside .bat)
+
+Now the Task Scheduler command stays simple:
+
+```cmd
+SCHTASKS /Create /SC DAILY /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /ST 05:32
+```
+
+Since logging is already inside the batch file, we don’t need extra redirection.
+
+---
+
+### ✅ 4. Verify it’s running
+
+```cmd
+SCHTASKS /Query /TN "S3DailySync" /V /FO LIST
+```
+
+And check logs:
+
+```cmd
+dir C:\Logs\s3sync_*.log
+type C:\Logs\s3sync_20250820_053200.log
+```
+
+---
+
+👉 This way you get:
+
+* **Clean sync command** (`aws s3 sync`)
+* **Automatic AWS credentials** (from `aws configure`)
+* **Rotating logs** per run with date + time
+
+---
+
+> It prints both success logs and error logs in the sam elog file.
+
+  
+</details>
