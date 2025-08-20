@@ -1897,6 +1897,72 @@ Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 5
 
 ---
 
+### Clean, minimal & follows the best practices.
+
 <details>
   <summary>Theoritical test case for s3 sync command following the best practices</summary>
+
+## 1. Create a PowerShell script
+
+Save this as `C:\scripts\s3sync.ps1`:
+
+```powershell
+# Simple daily S3 sync
+aws s3 sync "C:\Data\Reports" "s3://my-company-backups/reports/"
+```
+
+---
+
+## 2. Test it manually
+
+Open PowerShell and run:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\scripts\s3sync.ps1"
+```
+
+Check if files appear:
+
+```powershell
+aws s3 ls s3://my-company-backups/reports/ --recursive
+```
+
+---
+
+## 3. Schedule it in Windows Task Scheduler
+
+Run this in PowerShell to schedule it **daily at 05:32**:
+
+```powershell
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"`"C:\scripts\s3sync.ps1`"`""
+$trigger = New-ScheduledTaskTrigger -Daily -At 05:32
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive
+Register-ScheduledTask -TaskName "S3DailySync" -Action $action -Trigger $trigger -Principal $principal -Description "Daily sync C:\Data\Reports to S3"
+```
+
+---
+
+## 4. Verify it’s running
+
+```powershell
+Get-ScheduledTaskInfo -TaskName "S3DailySync" | Select LastRunTime, NextRunTime, LastTaskResult
+```
+
+* `LastTaskResult = 0` → success.
+* Files will be in your S3 bucket.
+
+---
+
+✨ That’s it. **Clean, minimal, follows best practices:**
+
+* Script is just `aws s3 sync source target`
+* Scheduled via Task Scheduler
+* Uses AWS CLI’s built-in behavior (timestamps, recursive copy, efficient sync)
+
+---
+
+> **Add Ons:**
+> **Make Task Scheduler log output to a file automatically** (instead of adding logging inside the script)? That keeps the script one line, but still gives you logs for troubleshooting.
+
+  
 </details>
