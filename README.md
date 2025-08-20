@@ -1429,9 +1429,14 @@ $ crontab -u mallick -e
 ---
 
 ## Cron Jobs in Windows
+The cron job concept is implemented through the Task Scheduler. This built-in tool enables you to automate the execution of scripts, applications, or processes based on specific triggers, much like the cron daemon does in Linux.
 
+The Task Scheduler offers a wide range of options for scheduling tasks to run at predetermined times, making it a powerful utility for automating regular tasks such as backups, log rotations, or data processing.
 
-
+### Steps
+- Open Windows PowerShell.
+- `SCHTASKS` to view all the scheduled tasks in the windows system.
+- 
 
 
 
