@@ -2480,3 +2480,541 @@ schtasks /Create /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /SC DAILY /ST 05:
 * show how to put AWS credentials in a shared file and set `AWS_SHARED_CREDENTIALS_FILE` for the scheduled task.
 
 </details>
+
+---
+
+### Only using CMD.
+
+<details>
+  <summary>Theoritical test case for s3 sync command following the best practices</summary>
+
+Yes — you can do this **entirely from CMD** (no PowerShell, no GUI) by using a batch wrapper + `schtasks.exe`. Below I give you a complete, copy-pasteable step-by-step plan:
+
+* create the folders and credentials,
+* create the batch script (with logging, lock, retries, dry-run),
+* configure credentials (interactive `aws configure` or a shared file usable by `SYSTEM`),
+* schedule with `schtasks /Create`,
+* run & test from CMD,
+* simulate failure cases,
+* inspect logs & Task Scheduler state,
+* change or delete the task with `schtasks`.
+
+I’ll explain each command/flag so you know what every word means.
+
+---
+
+# 0) Assumptions & prerequisites (quick)
+
+* Windows machine with Administrator rights to create scheduled tasks (or ability to create tasks for your user).
+* AWS CLI v2 installed and `aws` available in PATH (you can check from CMD with `aws --version`).
+* You want a pure CMD workflow (`.bat` + `schtasks` + standard Windows commands).
+
+Check AWS CLI from CMD:
+
+```cmd
+aws --version
+where aws
+```
+
+* `aws --version` prints CLI version.
+* `where aws` shows path(s) to the `aws` executable.
+
+---
+
+# 1) Create needed folders (run in an elevated CMD if needed)
+
+```cmd
+mkdir C:\scripts
+mkdir C:\Logs\s3sync
+mkdir C:\Temp
+```
+
+* `mkdir` creates directories. These hold the script, logs, and lock file.
+
+---
+
+# 2) Create the batch script (recommended: edit with Notepad from CMD)
+
+Open Notepad from CMD and paste the script (this avoids many awkward `echo` lines):
+
+```cmd
+notepad C:\scripts\s3sync.bat
+```
+
+Paste the exact contents below into Notepad and save.
+
+---
+
+### Copy/paste this batch file into `C:\scripts\s3sync.bat`
+
+```bat
+@echo off
+REM s3sync.bat - Batch wrapper for aws s3 sync with logging, lock, retries and dry-run support
+setlocal enabledelayedexpansion
+
+REM ===== CONFIG - edit these as needed =====
+set "SOURCE=C:\Data\Reports"
+set "BUCKET=s3://my-company-backups/reports/"
+set "PROFILE=mysync"
+set "LOGDIR=C:\Logs\s3sync"
+set "LOCK=C:\Temp\s3sync.lock"
+set "MAX_ATTEMPTS=3"
+set "BASE_DELAY=10"
+REM If you want the script to use a shared credentials file (for SYSTEM), set AWS_SHARED_CREDENTIALS_FILE below:
+REM set "AWS_SHARED_CREDENTIALS_FILE=C:\aws\credentials"
+REM =========================================
+
+REM Find aws executable if possible (uses PATH). If not found, fallback can be set above manually.
+for /f "delims=" %%i in ('where aws 2^>nul') do set "AWSPATH=%%i"
+if not defined AWSPATH (
+  REM Common default path - change if your aws is installed elsewhere
+  set "AWSPATH=C:\Program Files\Amazon\AWSCLI\bin\aws.exe"
+)
+
+if not exist "%AWSPATH%" (
+  echo ERROR: aws CLI not found at "%AWSPATH%". Ensure aws is installed and in PATH. >&2
+  exit /b 10
+)
+
+REM Parse optional first argument - if "dryrun" then pass --dryrun to aws
+set "DRYFLAG="
+if /I "%~1"=="dryrun" set "DRYFLAG=--dryrun"
+
+if not exist "%LOGDIR%" mkdir "%LOGDIR%"
+
+REM Create timestamp (YYYYMMDD_HHMMSS) using WMIC (works on many Windows versions)
+for /f "tokens=2 delims==." %%a in ('wmic os get LocalDateTime /value 2^>nul') do set "LDT=%%a"
+if defined LDT (
+  set "TIMESTAMP=%LDT:~0,8%_%LDT:~8,6%"
+) else (
+  REM fallback: crude timestamp if WMIC not available
+  for /f "tokens=1-2 delims= " %%a in ('echo %date% %time%') do set "TMPDT=%%a_%%b"
+  set "TIMESTAMP=%TMPDT::=%"
+  set "TIMESTAMP=%TIMESTAMP: =_%"
+)
+
+set "LOG=%LOGDIR%\s3sync_%TIMESTAMP%.log"
+echo === s3 sync start: %DATE% %TIME% === >> "%LOG%"
+
+REM Lock to prevent concurrent runs
+if exist "%LOCK%" (
+  echo Another instance detected (lock file present). Exiting. >> "%LOG%"
+  exit /b 2
+)
+echo %TIMESTAMP% > "%LOCK%"
+
+set /a ATTEMPT=0
+set EXITCODE=1
+set DELAY=%BASE_DELAY%
+
+:RETRY_LOOP
+set /a ATTEMPT+=1
+echo ------------------------------ >> "%LOG%"
+echo Attempt %ATTEMPT%: "%AWSPATH%" s3 sync "%SOURCE%" "%BUCKET%" --exact-timestamps --delete %DRYFLAG% --profile %PROFILE% >> "%LOG%"
+"%AWSPATH%" s3 sync "%SOURCE%" "%BUCKET%" --exact-timestamps --delete %DRYFLAG% --profile %PROFILE% >> "%LOG%" 2>&1
+set "EXITCODE=%ERRORLEVEL%"
+echo Exit code: %EXITCODE% >> "%LOG%"
+
+if "%EXITCODE%"=="0" goto FINISH
+if %ATTEMPT% geq %MAX_ATTEMPTS% goto FINISH
+
+echo Sleeping %DELAY% seconds before retry... >> "%LOG%"
+timeout /t %DELAY% /nobreak >nul
+set /a DELAY=%DELAY%*2
+goto RETRY_LOOP
+
+:FINISH
+del "%LOCK%" >nul 2>&1
+echo === s3 sync finished: %DATE% %TIME% ExitCode=%EXITCODE% === >> "%LOG%"
+exit /b %EXITCODE%
+```
+
+**What this does**
+
+* Creates timestamped logs (`C:\Logs\s3sync\...`).
+* Prevents concurrent runs via a lock file (`C:\Temp\s3sync.lock`).
+* Retries up to `MAX_ATTEMPTS` with exponential backoff (`BASE_DELAY` doubled each retry).
+* Supports `dryrun` when you call `s3sync.bat dryrun`.
+* Uses `--exact-timestamps` and `--delete` options for `aws s3 sync` (edit if you want different behaviour).
+* Returns non-zero exit codes for Task Scheduler to record.
+
+---
+
+# 3) Configure AWS credentials entirely from CMD
+
+Two options: interactive `aws configure` for a user, or create a shared credentials file for `SYSTEM` or other accounts.
+
+## Option A — configure for the user account (interactive)
+
+Run in CMD as the user who will run the scheduled task:
+
+```cmd
+aws configure --profile mysync
+```
+
+You’ll be prompted for:
+
+* AWS Access Key ID
+* AWS Secret Access Key
+* Default region name
+* Default output format (you can press Enter for json)
+
+**Meaning**
+
+* This writes `%USERPROFILE%\.aws\credentials` and `%USERPROFILE%\.aws\config` for that user. The batch uses `--profile mysync` to pick these credentials.
+
+## Option B — create a shared credentials file for SYSTEM or another account (non-interactive CMD)
+
+If you plan to run the task as `SYSTEM` or don't want to store creds in a user profile, create a shared credentials file and restrict its ACLs.
+
+**Create folder & file (replace `AKIA...` and `secret` with your keys):**
+
+```cmd
+mkdir C:\aws
+(
+  echo [mysync]
+  echo aws_access_key_id=AKIAREPLACEWITHKEY
+  echo aws_secret_access_key=REPLACE_WITH_SECRET
+  echo region=us-east-1
+) > C:\aws\credentials
+```
+
+**Secure the file so only SYSTEM and Administrators can read:**
+
+```cmd
+icacls C:\aws /inheritance:r
+icacls C:\aws /grant "NT AUTHORITY\SYSTEM:R"
+icacls C:\aws /grant "BUILTIN\Administrators:R"
+icacls C:\aws /remove "Users"
+```
+
+(Adjust ACLs as per your security policy.)
+
+**Tell the batch to use that file**
+Either uncomment / add the line in the batch script near top:
+
+```bat
+set "AWS_SHARED_CREDENTIALS_FILE=C:\aws\credentials"
+```
+
+or set it inside the scheduled task environment (below I show how the batch can set it itself).
+
+**Security note:** storing long-lived keys on disk has risks. If possible prefer short-lived credentials, instance profiles, or a service account with least privilege.
+
+---
+
+# 4) Test the batch manually (from CMD)
+
+Dry-run (no changes):
+
+```cmd
+C:\scripts\s3sync.bat dryrun
+```
+
+Real run:
+
+```cmd
+C:\scripts\s3sync.bat
+```
+
+Check newest log (list newest files):
+
+```cmd
+dir /b /o:-d C:\Logs\s3sync\*.log
+```
+
+Open latest log (use the filename returned above):
+
+```cmd
+type C:\Logs\s3sync\s3sync_20250820_053200.log | more
+```
+
+(Replace file name with the actual one.)
+
+---
+
+# 5) Create the scheduled task from CMD with `schtasks.exe` (no PowerShell)
+
+### Option 1 — Run as a specific Windows user (task will run whether user logged on or not)
+
+This will prompt you to enter the password (or you can include password after `/RP`, but that stores it in scheduler):
+
+```cmd
+schtasks /Create /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /SC DAILY /ST 05:32 /RU "MYDOMAIN\BackupUser" /RP "P@ssw0rd!" /RL HIGHEST /F
+```
+
+### Option 2 — Run as SYSTEM (no password required)
+
+```cmd
+schtasks /Create /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /SC DAILY /ST 05:32 /RU "SYSTEM" /RL HIGHEST /F
+```
+
+If using `SYSTEM`, ensure your `C:\aws\credentials` file exists and is readable by `SYSTEM` (see step 3 Option B) **or** the batch sets `AWS_SHARED_CREDENTIALS_FILE`.
+
+---
+
+### `schtasks` tokens explained (word-by-word)
+
+* `schtasks` — the Windows command-line tool to create/query/modify scheduled tasks.
+* `/Create` — create a new task.
+* `/TN "S3DailySync"` — Task Name (friendly name). Put it in quotes if it has spaces.
+* `/TR "C:\scripts\s3sync.bat"` — TaskRun: command that will be executed when the task runs; here it points to the batch file (full path recommended).
+* `/SC DAILY` — Schedule type; `DAILY` means every day. Other options: ONCE, WEEKLY, MONTHLY, MINUTE, HOURLY.
+* `/ST 05:32` — Start Time (HH\:mm, 24-hour).
+* `/RU "MYDOMAIN\BackupUser"` — Run as User account. Use `SYSTEM` to run as the local System account.
+* `/RP "P@ssw0rd!"` — Run Password — the password for the `/RU` account. Omit when `/RU SYSTEM`.
+* `/RL HIGHEST` — Run Level: `HIGHEST` runs with highest privileges (elevated). Alternatives: LIMITED.
+* `/F` — Force: overwrite existing task with same name without confirmation.
+
+---
+
+# 6) Start, query, change, and delete tasks from CMD
+
+Start task now:
+
+```cmd
+schtasks /Run /TN "S3DailySync"
+```
+
+Query task details:
+
+```cmd
+schtasks /Query /TN "S3DailySync" /V /FO LIST
+```
+
+* `/V` verbose
+* `/FO LIST` format as list (easy to read)
+
+Change a task (example: change start time to 03:00 or change the action):
+
+```cmd
+REM Change only the start time
+schtasks /Change /TN "S3DailySync" /ST 03:00
+
+REM Change the action (TaskRun) to pass an argument (e.g., dryrun)
+schtasks /Change /TN "S3DailySync" /TR "C:\scripts\s3sync.bat dryrun"
+```
+
+Delete the task:
+
+```cmd
+schtasks /Delete /TN "S3DailySync" /F
+```
+
+**Note:** `/Change` supports a subset of properties (time, runas, runlevel, taskrun). For complex updates, delete and `Create` again or use an XML import.
+
+---
+
+# 7) Test cases & how to simulate (all from CMD)
+
+Below are ways to simulate the important real-world cases and what to expect.
+
+## A. Dry-run
+
+```cmd
+C:\scripts\s3sync.bat dryrun
+```
+
+Expect: log contains `--dryrun` lines, no S3 changes, exit code 0.
+
+## B. Normal success
+
+Create test file and run:
+
+```cmd
+echo hello > C:\Data\Reports\hello.txt
+C:\scripts\s3sync.bat
+```
+
+Expect: `Exit code: 0` in the log and `aws s3 ls` will show object:
+
+```cmd
+aws s3 ls s3://my-company-backups/reports/ --profile mysync --recursive
+```
+
+## C. Bad credentials / permissions
+
+* Option 1: Run with a nonexistent profile:
+
+  ```cmd
+  REM temporarily set PROFILE to bogus in the batch by editing the file, or run aws directly:
+  "C:\Program Files\Amazon\AWSCLI\bin\aws.exe" s3 sync "C:\Data\Reports" s3://my-company-backups/reports/ --profile bogusprofile
+  ```
+* Option 2: Rename the credentials file `C:\aws\credentials` (if using shared).
+  Expect: `AccessDenied` or credential error in the log; non-zero exit code.
+
+## D. Bucket not found
+
+```cmd
+"C:\Program Files\Amazon\AWSCLI\bin\aws.exe" s3 sync "C:\Data\Reports" s3://this-bucket-does-not-exist-12345 --profile mysync
+```
+
+Expect: `NoSuchBucket` / 404 message in log; non-zero exit.
+
+## E. Network failure (safe simulation)
+
+Run the sync with an invalid endpoint to force connection failures:
+
+```cmd
+"C:\Program Files\Amazon\AWSCLI\bin\aws.exe" s3 sync "C:\Data\Reports" s3://my-company-backups/reports/ --profile mysync --endpoint-url http://127.0.0.1:1
+```
+
+Expect: connection errors in log and the batch retries (see Attempt 1,2... and backoff).
+
+## F. Interrupted large upload (manual)
+
+* Create a large file:
+
+  ```cmd
+  fsutil file createnew C:\Data\Reports\bigfile.bin 200000000
+  ```
+* Start the batch in a separate CMD window:
+
+  ```cmd
+  C:\scripts\s3sync.bat
+  ```
+* While `aws` runs, find and kill the aws process:
+
+  ```cmd
+  tasklist | findstr aws
+  taskkill /IM aws.exe /F
+  ```
+* Re-run the batch:
+
+  ```cmd
+  C:\scripts\s3sync.bat
+  ```
+
+Expect: AWS CLI will use multipart uploads; re-run should finish the upload or resume; logs show progress.
+
+## G. Concurrent runs
+
+Start the task twice rapidly:
+
+```cmd
+C:\scripts\s3sync.bat
+C:\scripts\s3sync.bat
+```
+
+The second run should detect the lock file and exit with code `2`. Log will contain `Another instance detected`.
+
+---
+
+# 8) Inspecting logs & scheduler events (CMD)
+
+List logs (newest first):
+
+```cmd
+dir /O:-D C:\Logs\s3sync\*.log
+```
+
+Show the latest log:
+
+```cmd
+for /f "delims=" %f in ('dir /b /o:-d C:\Logs\s3sync\*.log') do @type "C:\Logs\s3sync\%f" & goto :done
+:done
+```
+
+(If used inside a `.bat` file, double `%` for the loop variable: `%%f`.)
+
+View Task Scheduler operational events (Task Scheduler history) via `wevtutil` (search for the task name in messages):
+
+```cmd
+wevtutil qe "Microsoft-Windows-TaskScheduler/Operational" /c:50 /f:text | findstr /I "S3DailySync"
+```
+
+* `wevtutil qe` queries the event log.
+* `/c:50` returns up to 50 events.
+* `findstr` filters by the task name.
+
+Also you can use:
+
+```cmd
+schtasks /Query /TN "S3DailySync" /V /FO LIST
+```
+
+to see `Last Run Time` and `Last Result`.
+
+---
+
+# 9) Modify task: change time, action, or user (CMD)
+
+Change start time:
+
+```cmd
+schtasks /Change /TN "S3DailySync" /ST 03:00
+```
+
+Change the command the task runs (pass dry-run):
+
+```cmd
+schtasks /Change /TN "S3DailySync" /TR "C:\scripts\s3sync.bat dryrun"
+```
+
+Change run-as user/password (re-create recommended if complex):
+
+```cmd
+schtasks /Create /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /SC DAILY /ST 05:32 /RU "MYDOMAIN\BackupUser" /RP "NewPassword!" /RL HIGHEST /F
+```
+
+(Using `/Create /F` will overwrite the existing task.)
+
+---
+
+# 10) Best practices & security notes (CMD-oriented)
+
+* Use the **least-privilege IAM** credentials for S3 access.
+* Prefer running task under a dedicated service account (not an interactive user).
+* If you must store credentials on disk, use a shared file and restrict ACLs (`icacls`) to only the accounts that must access it.
+* Keep `aws` path absolute in the batch to avoid PATH issues under Task Scheduler.
+* Use timestamped logs and rotate or delete old logs periodically.
+* Use the lock file and Task Scheduler option “If the task is already running: Do not start a new instance” (you can set this in GUI — for pure CMD you can recreate the task with XML specifying the behavior; easier: keep locking in the batch).
+* Monitor non-zero `Last Run Result` values and send alerts if important (you can extend the batch to send an email or log an event with `eventcreate`).
+
+---
+
+# 11) Quick checklist — copy/paste to run now from CMD
+
+```cmd
+REM 1) Make folders
+mkdir C:\scripts
+mkdir C:\Logs\s3sync
+mkdir C:\Temp
+
+REM 2) Create the batch (open Notepad, paste batch code)
+notepad C:\scripts\s3sync.bat
+
+REM 3) Configure AWS profile interactively for the user who will run the task:
+aws configure --profile mysync
+
+REM 4) Test dry-run:
+C:\scripts\s3sync.bat dryrun
+
+REM 5) Test real run:
+C:\scripts\s3sync.bat
+
+REM 6) Create scheduled task (run as SYSTEM or specify user+password)
+schtasks /Create /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /SC DAILY /ST 05:32 /RU "SYSTEM" /RL HIGHEST /F
+
+REM 7) Start now to test scheduled run:
+schtasks /Run /TN "S3DailySync"
+
+REM 8) Query status:
+schtasks /Query /TN "S3DailySync" /V /FO LIST
+```
+
+---
+
+# 12) Final notes / quick answers to likely follow-ups
+
+* If you want the task created for a domain account but you **don’t want to include the password on the command line**, run the `schtasks /Create` without `/RP` — Windows will prompt for it, or create via GUI.
+* If you want to run even when the user isn’t logged on, you must provide credentials (or use `SYSTEM`).
+* If you’d like, I can produce the **exact `schtasks` XML** (create /delete via XML import), which gives you even finer control (task history limits, multiple triggers, start boundary, stop boundary). Tell me whether you want the task as `SYSTEM` (recommended for server automation) or as a specific domain/local user so I tailor the credentials/ACL guidance.
+
+---
+
+> Add Ons:
+* produce the final `C:\scripts\s3sync.bat` file with your exact `SOURCE` and `BUCKET` values substituted, and show the exact `schtasks` command to create the task as `SYSTEM` or as your user (pick one), **or**
+* give you the `schtasks` XML export so you can re-import the exact same task on other machines.
+
+</details>
