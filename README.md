@@ -1558,7 +1558,7 @@ If you want me to tailor the “today” run to an exact time (e.g., **20 Aug 20
 ---
 ---
 
-Nice — I’ll give you a concrete, copy-pasteable **test plan + PowerShell script + step-by-step commands** so you can verify the scheduled task (Windows “cron”) will run your `aws s3 sync` reliably in **all** important cases (success, network failure, bad creds, bucket missing, concurrent runs, interrupted transfer, dry-run, etc).
+**Test plan + PowerShell script + step-by-step commands**, It can verify the scheduled task (Windows “cron”) will run your `aws s3 sync` reliably in **all** important cases (success, network failure, bad creds, bucket missing, concurrent runs, interrupted transfer, dry-run, etc).
 
 I’ll include:
 
