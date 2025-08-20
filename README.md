@@ -1887,12 +1887,16 @@ Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 5
 
 ---
 
-If you want, I can:
-
-* generate the exact Register-ScheduledTask command with your real `$Source`, `$Bucket`, and desired schedule, or
-* produce a small wrapper that also emails you on failure (SMTP) or posts to Slack/Teams.
-
-Tell me which one you want and I’ll give the exact command to paste.
+- Add Ons:
+> generate the exact Register-ScheduledTask command with your real `$Source`, `$Bucket`, and desired schedule, or
+> produce a small wrapper that also emails you on failure (SMTP) or posts to Slack/Teams.
 
 
+
+</details>
+
+---
+
+<details>
+  <summary>Theoritical test case for s3 sync command following the best practices</summary>
 </details>
