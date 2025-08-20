@@ -3018,3 +3018,91 @@ schtasks /Query /TN "S3DailySync" /V /FO LIST
 * give you the `schtasks` XML export so you can re-import the exact same task on other machines.
 
 </details>
+
+---
+
+### Clean, Minimal and Follows Best Practices using CMD
+
+<details>
+  <summary>Theoritical test case for s3 sync command following the best practices</summary>
+
+Got it 👍 — if you want **only CMD (Command Prompt)** and not PowerShell, here’s the **clean + best-practice** way:
+
+---
+
+## 1. Create a batch file
+
+Save as `C:\scripts\s3sync.bat`:
+
+```bat
+@echo off
+aws s3 sync "C:\Data\Reports" "s3://my-company-backups/reports/"
+```
+
+That’s the **entire script** — clean, just `aws s3 sync`.
+
+---
+
+## 2. Test manually
+
+Open **CMD** and run:
+
+```cmd
+C:\scripts\s3sync.bat
+```
+
+Check S3:
+
+```cmd
+aws s3 ls s3://my-company-backups/reports/ --recursive
+```
+
+---
+
+## 3. Schedule it with Task Scheduler (CMD version)
+
+In CMD, register the task to run daily at 05:32:
+
+```cmd
+SCHTASKS /Create /SC DAILY /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /ST 05:32
+```
+
+---
+
+## 4. Verify scheduled task
+
+```cmd
+SCHTASKS /Query /TN "S3DailySync" /V /FO LIST
+```
+
+---
+
+## 5. Logging (optional, still clean)
+
+If you want logs without touching the `.bat`, update the task with output redirection:
+
+```cmd
+SCHTASKS /Create /SC DAILY /TN "S3DailySync" /TR "cmd.exe /c C:\scripts\s3sync.bat >> C:\Logs\s3sync.log 2>&1" /ST 05:32 /F
+```
+
+Then view logs:
+
+```cmd
+type C:\Logs\s3sync.log
+```
+
+---
+
+✅ That way:
+
+* Batch script = **1 line clean**
+* Scheduling = via `SCHTASKS` (native CMD tool)
+* Logging = optional, handled outside script
+
+---
+
+> Add Ons
+We can make the **log file rotate daily in CMD** (like `s3sync_20250820.log`) so we don’t overwrite.
+
+
+</details>  
