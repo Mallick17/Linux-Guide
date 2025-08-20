@@ -1897,7 +1897,7 @@ Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 5
 
 ---
 
-### Clean, minimal & follows the best practices.
+### Clean, minimal & follows the best practices using Windows Powershell.
 
 <details>
   <summary>Theoritical test case for s3 sync command following the best practices</summary>
@@ -2211,4 +2211,272 @@ Register-ScheduledTask -TaskName "S3DailySync" -Action $action -Trigger $trigger
 </details>
 
   
+</details>
+
+### Clean, minimal & follows the best practices using Task Scehduler and CMD not using Windows Powershell.
+
+<details>
+  <summary>Theoritical test case for s3 sync command following the best practices</summary>
+
+Nice — below I’ll show **how to do the whole thing using only Task Scheduler (no PowerShell)**. I give you:
+
+1. A small **batch wrapper** that reproduces the important behavior (logging, lock to avoid concurrent runs, retries with exponential backoff, exit codes).
+2. Exact **Task Scheduler (GUI) steps** that call that batch file.
+3. A **`schtasks.exe`** one-line example to create the same task from CMD (no PowerShell).
+4. How to **test, inspect logs, and troubleshoot**.
+
+---
+
+# A — Batch wrapper (put this in `C:\scripts\s3sync.bat`)
+
+This is the recommended way if you want to avoid PowerShell entirely but still have logging, locking and retries.
+
+Save exactly as a plain text file `C:\scripts\s3sync.bat`:
+
+```bat
+@echo off
+REM Simple S3 sync wrapper (batch) with lock, logging, retries
+
+setlocal enabledelayedexpansion
+
+REM === Config ===
+set "SOURCE=C:\Data\Reports"
+set "BUCKET=s3://my-company-backups/reports/"
+set "PROFILE=mysync"
+set "LOGDIR=C:\Logs\s3sync"
+set "LOCK=C:\Temp\s3sync.lock"
+set "MAX_ATTEMPTS=3"
+set "BASE_DELAY=10"
+set "AWSPATH=C:\Program Files\Amazon\AWSCLI\bin\aws.exe"
+REM === End config ===
+
+if not exist "%LOGDIR%" mkdir "%LOGDIR%"
+
+REM Create readable timestamp using WMIC (format: YYYYMMDD_HHMMSS)
+for /f "tokens=2 delims==." %%a in ('wmic os get LocalDateTime /value 2^>nul') do set "LDT=%%a"
+if defined LDT (
+  set "TIMESTAMP=%LDT:~0,8%_%LDT:~8,6%"
+) else (
+  REM fallback if WMIC unavailable
+  for /f "tokens=1-3 delims=/ " %%a in ('date /t') do set "DATEPART=%%c%%a%%b"
+  for /f "tokens=1-2 delims=:." %%a in ('time /t') do set "TIMEPART=%%a%%b"
+  set "TIMESTAMP=%DATEPART%_%TIMEPART%"
+)
+
+set "LOG=%LOGDIR%\s3sync_%TIMESTAMP%.log"
+echo === s3 sync start: %DATE% %TIME% === >> "%LOG%"
+
+REM Check aws executable exists (use full path to avoid PATH issues)
+if not exist "%AWSPATH%" (
+  echo ERROR: aws CLI not found at "%AWSPATH%". Ensure aws.exe path is correct. >> "%LOG%"
+  exit /b 10
+)
+
+REM Lock check to avoid concurrent runs
+if exist "%LOCK%" (
+  echo Another instance detected (lock file present). Exiting. >> "%LOG%"
+  exit /b 2
+)
+echo %TIMESTAMP% > "%LOCK%"
+
+set "ATTEMPT=0"
+set "DELAY=%BASE_DELAY%"
+set "EXITCODE=1"
+
+:RETRY_LOOP
+set /a ATTEMPT+=1
+echo ------------------------------ >> "%LOG%"
+echo Attempt %ATTEMPT%: "%AWSPATH%" s3 sync "%SOURCE%" "%BUCKET%" --exact-timestamps --delete --profile %PROFILE% >> "%LOG%"
+"%AWSPATH%" s3 sync "%SOURCE%" "%BUCKET%" --exact-timestamps --delete --profile %PROFILE% >> "%LOG%" 2>&1
+set "EXITCODE=%ERRORLEVEL%"
+echo Exit code: %EXITCODE% >> "%LOG%"
+
+if "%EXITCODE%"=="0" goto FINISH
+if %ATTEMPT% geq %MAX_ATTEMPTS% goto FINISH
+
+echo Sleeping %DELAY% seconds before retry... >> "%LOG%"
+timeout /t %DELAY% /nobreak >nul
+set /a DELAY=%DELAY%*2
+goto RETRY_LOOP
+
+:FINISH
+del "%LOCK%" >nul 2>&1
+echo === s3 sync finished: %DATE% %TIME% ExitCode=%EXITCODE% === >> "%LOG%"
+exit /b %EXITCODE%
+```
+
+**Why this file exists**
+
+* Task Scheduler will **launch the `.bat`**, which runs `aws.exe`.
+* The batch script performs the important bookkeeping (timestamped log, lock, retries), which Task Scheduler alone cannot easily do.
+
+---
+
+# B — Create the task using the Task Scheduler GUI (step-by-step, no PowerShell)
+
+1. Open **Task Scheduler** (Start → type “Task Scheduler” → Enter).
+
+2. In the right-hand Actions pane click **Create Task…** (do **not** use “Create Basic Task” if you want full options).
+
+3. **General tab**
+
+   * **Name:** `S3DailySync`
+   * **Description:** `Daily sync C:\Data\Reports -> s3://my-company-backups/reports/`
+   * **Security options:**
+
+     * **Choose user/account**: pick the Windows account that has the AWS CLI profile configured (see notes below).
+     * If you want the task to run even when no one is logged on: select **"Run whether user is logged on or not"** (you will be prompted for the account password when saving).
+     * Check **"Run with highest privileges"** if your sync requires elevated file access.
+   * **Configure for:** choose your OS (e.g. Windows 10/Windows Server 2016).
+
+4. **Triggers tab**
+
+   * Click **New…**
+   * **Begin the task:** On a schedule
+   * **Settings:** Daily
+   * **Start:** `05:32:00` (or your preferred time)
+   * Click **OK**.
+
+5. **Actions tab**
+
+   * Click **New…**
+   * **Action:** Start a program
+   * **Program/script:** `C:\scripts\s3sync.bat`
+     (Alternatively: `cmd.exe` and put `/c "C:\scripts\s3sync.bat"` in the *Add arguments* field — either works. For simplicity, use the `.bat` path directly.)
+   * **Start in (optional):** `C:\scripts` (optional but can help relative paths)
+   * Click **OK**.
+
+6. **Conditions tab** (optional)
+
+   * Uncheck **"Start the task only if the computer is on AC power"** if you want it to run on battery (for laptops).
+   * Leave defaults or tweak per environment.
+
+7. **Settings tab**
+
+   * Check **"Allow task to be run on demand"** (handy to test).
+   * For **If the task is already running, then the following rule applies:** choose **Do not start a new instance** (this protects against overlapping runs).
+   * Optionally set **Stop the task if it runs longer than:** e.g. 4 hours.
+   * Click **OK**. If you chose “Run whether user is logged on or not” you’ll be asked to provide the account password to register the task.
+
+8. After creation: right-click the task → **Run** to test immediately. Inspect the log file created in `C:\Logs\s3sync\` for details.
+
+---
+
+# C — Create the same task purely from CMD using `schtasks.exe` (no PowerShell)
+
+Open an elevated Command Prompt (Run as Administrator) and run (adjust user/password as needed):
+
+```cmd
+schtasks /Create /TN "S3DailySync" /TR "C:\scripts\s3sync.bat" /SC DAILY /ST 05:32 /RU "MYDOMAIN\BackupUser" /RP "P@ssw0rd!" /RL HIGHEST /F
+```
+
+**Fields explained**
+
+* `/Create` → create a new task.
+* `/TN "S3DailySync"` → task name.
+* `/TR "C:\scripts\s3sync.bat"` → program to run (full path).
+* `/SC DAILY` → schedule type = daily.
+* `/ST 05:32` → start time.
+* `/RU "user"` and `/RP "password"` → run as this user; for local SYSTEM account use `/RU "SYSTEM"` and omit `/RP`.
+* `/RL HIGHEST` → run with highest privileges.
+* `/F` → force create/overwrite existing task with same name.
+
+**Quick control commands**
+
+* Start now: `schtasks /Run /TN "S3DailySync"`
+* Query: `schtasks /Query /TN "S3DailySync" /V /FO LIST`
+* Delete: `schtasks /Delete /TN "S3DailySync" /F`
+
+---
+
+# D — How to test & inspect results (no PowerShell)
+
+1. Manual run (CMD):
+
+   ```cmd
+   C:\scripts\s3sync.bat
+   ```
+
+   or via Task Scheduler:
+
+   ```cmd
+   schtasks /Run /TN "S3DailySync"
+   ```
+
+2. View the latest log file:
+
+   * Open File Explorer → go to `C:\Logs\s3sync\` → open the newest `s3sync_*.log` in Notepad (double click).
+   * Or from CMD:
+
+     ```cmd
+     dir /O:-D C:\Logs\s3sync\*.log
+     type C:\Logs\s3sync\s3sync_YYYYMMDD_HHMMSS.log | more
+     ```
+
+     (replace filename with the real one or use the GUI to see the newest)
+
+3. Check Task Scheduler status:
+
+   * In GUI: Select the task and look at **Last Run Time** and **Last Run Result**.
+   * From CMD:
+
+     ```cmd
+     schtasks /Query /TN "S3DailySync" /V /FO LIST
+     ```
+
+4. Check S3 contents:
+
+   * If you want a quick check from the same account:
+
+     ```cmd
+     "C:\Program Files\Amazon\AWSCLI\bin\aws.exe" s3 ls s3://my-company-backups/reports/ --profile mysync --recursive
+     ```
+
+---
+
+# E — Important notes & gotchas
+
+1. **AWS credentials for the scheduled account**
+   The task runs under the Windows account you specify. AWS CLI looks for credentials under that user’s `%USERPROFILE%\.aws\credentials`. Make sure you run `aws configure --profile mysync` **for that Windows user** (or place a shared credentials file and configure the environment variable `AWS_SHARED_CREDENTIALS_FILE` for the service account). If you schedule the task under `SYSTEM`, you must provide credentials in a way `SYSTEM` can read (system env vars or a shared credentials file).
+
+2. **Full path to `aws.exe`**
+   Use the full path in the batch (`AWSPATH` variable) because Task Scheduler’s environment/path may differ from your interactive shell.
+
+3. **Permissions**
+   The account that runs the task needs read access to the source folder and write access to the log folder.
+
+4. **Locking vs Task Scheduler instance policy**
+   In the batch we use a lock file to prevent concurrent runs. Task Scheduler also has a “Do not start a new instance” setting — using both is safe and gives defense-in-depth.
+
+5. **Log rotation**
+   The batch creates timestamped logs. Add a cleanup scheduled task (or a simple cleanup step) to delete logs older than X days if needed.
+
+6. **Exit codes**
+   The batch returns non-zero exit codes on error; Task Scheduler **Last Run Result** will show that numeric code. Inspect the log file and AWS error messages to know what failed.
+
+7. **Network errors / retries**
+   The batch includes retries with exponential backoff. You can tune `MAX_ATTEMPTS` and `BASE_DELAY` in the script.
+
+---
+
+# F — Quick troubleshooting checklist
+
+* If `Last Run Result` is non-zero:
+
+  * Open the newest `C:\Logs\s3sync\*.log`.
+  * Ensure `aws.exe` path in the batch is correct.
+  * Ensure the Windows user running the task has the AWS profile configured — run `aws configure --profile mysync` as that user.
+  * If you used `Run whether user is logged on or not` and the task failed to start, re-enter the password (Task Scheduler will prompt when editing and saving).
+* If no logs are created:
+
+  * Verify `Start in` or full path in the Action is correct and that the task can read/write `C:\Logs\s3sync`.
+* To debug interactively: run the batch manually in an elevated CMD so you can see output and errors instantly.
+
+---
+
+> Add Ons:
+* produce a **minimal `.bat`** that also supports a `--DryRun` toggle via a command-line arg (so you can run `s3sync.bat dryrun`), or
+* give you the exact `schtasks` command to run as `SYSTEM` (if that's your desired account), or
+* show how to put AWS credentials in a shared file and set `AWS_SHARED_CREDENTIALS_FILE` for the scheduled task.
+
 </details>
