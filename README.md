@@ -1440,3 +1440,114 @@ The Task Scheduler offers a wide range of options for scheduling tasks to run at
 
 
 
+Got it! Your cron line:
+
+```
+32 05 14 2 5 echo "hello" > /tmp/test.txt
+```
+
+…means: write “hello” to a file at **05:32**, either when it’s **Feb 14** or it’s **Friday** (cron’s “either DOM or DOW” behavior).
+
+Below are two simple PowerShell ways:
+
+---
+
+# A) Do it **once today** (easiest)
+
+This runs the equivalent command at today’s date, a couple minutes from now.
+
+1. Open PowerShell.
+
+2. Paste this (it schedules a one-off job a few minutes from now and creates `C:\Temp\test.txt` with “hello”):
+
+```powershell
+# 1. Pick a time a couple minutes from now (today)
+$runAt   = (Get-Date).AddMinutes(2)
+
+# 2. Define what to run (make sure the folder exists, then write "hello")
+$script  = {
+  New-Item -ItemType Directory -Path 'C:\Temp' -Force | Out-Null
+  Set-Content -Path 'C:\Temp\test.txt' -Value 'hello'
+}
+
+# 3. Schedule it as a one-off "Scheduled Job"
+$trigger = New-JobTrigger -Once -At $runAt
+Register-ScheduledJob -Name 'WriteHelloToday' -ScriptBlock $script -Trigger $trigger | Out-Null
+
+# 4. Confirm next run time
+Get-ScheduledJob -Name 'WriteHelloToday' | Select-Object Name, NextRunTime
+```
+
+3. After the time passes, verify the result:
+
+```powershell
+Get-Content 'C:\Temp\test.txt'
+```
+
+4. (Optional) Clean up:
+
+```powershell
+Unregister-ScheduledJob -Name 'WriteHelloToday' -Force
+```
+
+> Notes
+> • This uses PowerShell’s **Scheduled Jobs** (no password prompts; runs under your user).
+> • `Set-Content` overwrites the file (like `>`). Use `Add-Content` if you want to append (like `>>`).
+
+---
+
+# B) Make a **recurring schedule** like your cron
+
+Windows doesn’t have cron, but **Task Scheduler** can match the same behavior by adding **two triggers** (OR logic): one for Fridays at 05:32 and one for Feb 14 at 05:32.
+
+1. Open PowerShell **as your user**.
+
+2. Run:
+
+```powershell
+# Action: run PowerShell that ensures folder exists and writes "hello"
+$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument @'
+-NoProfile -WindowStyle Hidden -Command "New-Item -ItemType Directory -Path ''C:\Temp'' -Force | Out-Null; Set-Content -Path ''C:\Temp\test.txt'' -Value ''hello''"
+'@
+
+# Triggers: Friday 05:32, and Feb 14 05:32 (every year)
+$tWeekly  = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Friday -At 05:32
+$tYearly  = New-ScheduledTaskTrigger -At 05:32 -DaysOfMonth 14 -Months February
+
+# Principal: run as the currently logged-in user (no password prompt)
+$principal = New-ScheduledTaskPrincipal -UserId $env:UserName -LogonType Interactive
+
+# Register the task
+Register-ScheduledTask `
+  -TaskName 'WriteHelloCronEquivalent' `
+  -Action $action `
+  -Trigger @($tWeekly, $tYearly) `
+  -Principal $principal `
+  -Description 'Mimic cron: 32 05 14 2 5' | Out-Null
+
+# See it
+Get-ScheduledTask -TaskName 'WriteHelloCronEquivalent' | Select-Object TaskName, State
+```
+
+3. (Optional) Remove later:
+
+```powershell
+Unregister-ScheduledTask -TaskName 'WriteHelloCronEquivalent' -Confirm:$false
+```
+
+---
+
+## Quick Windows equivalents of your shell line
+
+* Overwrite (like `>`):
+
+  ```powershell
+  Set-Content -Path 'C:\Temp\test.txt' -Value 'hello'
+  ```
+* Append (like `>>`):
+
+  ```powershell
+  Add-Content -Path 'C:\Temp\test.txt' -Value 'hello'
+  ```
+
+If you want me to tailor the “today” run to an exact time (e.g., **20 Aug 2025, 15:10 IST**) just say the time you want and I’ll drop in the exact command.
