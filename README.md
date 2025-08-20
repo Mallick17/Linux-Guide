@@ -1347,8 +1347,11 @@ logger -s Hello
 
 
 
-## Cron Jobs
+## Cron Jobs in Linux
 Cron jobs are scheduled tasks in Linux that run at specified intervals. The cron daemon (`crond`) executes these jobs based on time intervals defined in a user's crontab file.
+
+<details>
+  <summary>Click to view the steps</summary>
 
 ### Checking and Creating Cron Jobs
 - To check the existing cron jobs:
@@ -1421,7 +1424,12 @@ $ crontab -u mallick -e
 ```
 - This ensures the job executes hourly.
 
+</details>
+
 ---
+
+## Cron Jobs in Windows
+
 
 
 
