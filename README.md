@@ -3222,5 +3222,38 @@ type C:\Logs\s3sync_20250820_053200.log
 
 > It prints both success logs and error logs in the sam elog file.
 
+---
+
+### How to delete a cron task Scheduler in Windows
+
+#### 🔹 Option 1: Using `Unregister-ScheduledTask` (native PowerShell cmdlet)
+
+If you created the task as `S3DailySync`:
+
+```powershell
+Unregister-ScheduledTask -TaskName "S3DailySync" -Confirm:$false
+```
+
+That will delete it **silently** (no confirmation).
+
+---
+
+#### 🔹 Option 2: Using `schtasks.exe` (classic CMD tool, but callable in PowerShell)
+
+```powershell
+schtasks /Delete /TN "S3DailySync" /F
+```
+
+`/F` = force delete without confirmation.
+
+---
+
+✅ Best practice:
+
+* Use **`Unregister-ScheduledTask`** if you want pure PowerShell.
+* Use **`schtasks`** if you want to stay consistent with how you created the task.
+
+---
+
   
 </details>
