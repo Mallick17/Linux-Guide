@@ -3257,3 +3257,77 @@ schtasks /Delete /TN "S3DailySync" /F
 
   
 </details>
+
+
+Great question 👍 let me clear this up.
+
+When you run the **manual command** (`aws s3 sync ...`) without `--profile`, the AWS CLI looks for credentials in this order:
+
+1. **Environment variables** (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`)
+2. **Default profile** (`[default]`) in `~/.aws/credentials`
+3. **Named profile** (if you specify `--profile my-sync-profile`)
+4. **EC2/ECS instance role** (like your `aws-elasticbeanstalk-ec2-role`)
+
+---
+
+### 🔹 Why manual works without `--profile`
+
+* In your interactive PowerShell or CMD session, you probably have credentials already available:
+
+  * Maybe you ran `aws configure` once, so you have a `[default]` profile.
+  * Or you might be using AWS SSO/session manager which cached credentials.
+  * Or your environment variables are set in your shell session.
+
+So the CLI finds them → command works. ✅
+
+---
+
+### 🔹 Why Task Scheduler fails
+
+* Task Scheduler **runs in a fresh environment** with no session variables.
+* It doesn’t know about your interactive session.
+* If you didn’t specify `--profile`, it tries the **instance role (Elastic Beanstalk role)**, which lacks `s3:ListBucket` → error ❌.
+
+---
+
+### 🔹 Solution
+
+If you always want it to behave the **same in manual & scheduled runs**, you can:
+
+1. **Force profile usage everywhere**
+
+   ```powershell
+   aws s3 sync "C:\Data\Reports" "s3://bucket-name/path" --profile my-sync-profile
+   ```
+
+2. **OR set your profile as default**
+   In `~/.aws/credentials`:
+
+   ```ini
+   [default]
+   aws_access_key_id=YOUR_KEY
+   aws_secret_access_key=YOUR_SECRET
+   ```
+
+   Then no need for `--profile`.
+
+3. **OR export environment variables** (works in scripts and schedulers):
+
+   ```powershell
+   setx AWS_ACCESS_KEY_ID "YOUR_KEY"
+   setx AWS_SECRET_ACCESS_KEY "YOUR_SECRET"
+   setx AWS_DEFAULT_REGION "ap-south-1"
+   ```
+
+   (These will persist in the user environment, so Task Scheduler will also see them.)
+
+---
+
+👉 So basically:
+
+* Manual works because credentials are already present in your shell.
+* Task Scheduler fails because it doesn’t inherit those.
+
+That’s why the **profile method** (or environment variables) is the safest way to make both manual & scheduled runs consistent.
+
+---
