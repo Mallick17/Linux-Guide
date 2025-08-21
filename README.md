@@ -1898,12 +1898,11 @@ Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 5
 ---
 
 ### Clean, minimal & follows the best practices using Windows Powershell.
+- While executing these steps
+  - 1st issue Permission Issue to list objects
 
 <details>
   <summary>Theoritical test case for s3 sync command following the best practices</summary>
-
-Perfect 👍 let’s keep everything **inside PowerShell only** — no `.cmd` usage at all.
-Here’s the **clean step-by-step**:
 
 ---
 
